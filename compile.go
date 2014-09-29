@@ -35,11 +35,11 @@ func (p Posts) Less(i, j int) bool {
 	p2 := p[j]["date"].(string)
 	pt1, err := time.Parse("2006-01-02 15:04:05", p1)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 	pt2, err := time.Parse("2006-01-02 15:04:05", p2)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 	return pt1.After(pt2)
 }
@@ -56,12 +56,27 @@ func init() {
 func compileApp(cmd *Command, args []string) {
 	posts, err := loadPosts()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		return
 	}
 
+	var prev, next *Mapper
 	for i, v := range posts {
-		p, _ := createPost(v)
+		if i > 0 {
+			prev = &posts[i-1]
+		} else {
+			prev = nil
+		}
+		if i < len(posts)-1 {
+			next = &posts[i+1]
+		} else {
+			next = nil
+		}
+		p, err := createPost(v, prev, next)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err.Error())
+			continue
+		}
 		posts[i] = p
 	}
 	createIndex(posts)
@@ -79,7 +94,7 @@ func loadPosts() (Posts, error) {
 		}
 		post, err := loadPost(path)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, err.Error())
+			fmt.Fprintln(os.Stderr, err.Error())
 			return err
 		}
 		post["path"] = path
@@ -108,7 +123,7 @@ func loadPost(path string) (post Mapper, err error) {
 	return
 }
 
-func createPost(post Mapper) (Mapper, error) {
+func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	var buf bytes.Buffer
 	link := "." + post["permalink"].(string)
 	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
@@ -117,9 +132,17 @@ func createPost(post Mapper) (Mapper, error) {
 	}
 	content := post["content"].(string)
 	post["content"] = template.HTML(MarkdownToHtml(content))
-	t, err := template.ParseFiles("./tpl/post.html", "./tpl/comment.html", "./tpl/navbar.html", "./tpl/footer.html")
+	t, err := template.ParseFiles("./tpl/post.html", "./tpl/paginator.html", "./tpl/comment.html", "./tpl/navbar.html", "./tpl/footer.html")
 	if err != nil {
 		return post, err
+	}
+	if prev != nil {
+		post["previous_url"] = (*prev)["permalink"]
+		post["previous_title"] = (*prev)["title"]
+	}
+	if next != nil {
+		post["next_url"] = (*next)["permalink"]
+		post["next_title"] = (*next)["title"]
 	}
 	err = t.Execute(&buf, post)
 	if err != nil {

@@ -9,26 +9,26 @@ import (
 	"strings"
 )
 
-var usageTemplate = `pagedump is a static website generate tool.
+var usageTemplate = `pd is a static website generate tool.
 
 Usage:
-	pagedump command [arguments]
+	pd command [arguments]
 
 The commands are:
 {{range .}}{{if .Runnable}}
     {{.Name | printf "%-11s"}} {{.Short}}{{end}}{{end}}
 
-Use "pagedump help [command]" for more information about a command.
+Use "pd help [command]" for more information about a command.
 
 Additional help topics:
 {{range .}}{{if not .Runnable}}
     {{.Name | printf "%-11s"}} {{.Short}}{{end}}{{end}}
 
-Use "pagedump help [topic]" for more information about that topic.
+Use "pd help [topic]" for more information about that topic.
 
 `
 
-var helpTemplate = `{{if .Runnable}}usage: pagedump {{.UsageLine}}
+var helpTemplate = `{{if .Runnable}}usage: pd {{.UsageLine}}
 
 {{end}}{{.Long | trim}}`
 
@@ -86,7 +86,7 @@ func help(args []string) {
 		return
 	}
 	if len(args) != 1 {
-		fmt.Fprintf(os.Stdout, "usage: pagedump help command\n\nToo many arguments given.\n")
+		fmt.Fprintf(os.Stdout, "usage: pd help command\n\nToo many arguments given.\n")
 		os.Exit(2)
 	}
 
@@ -99,7 +99,7 @@ func help(args []string) {
 		}
 	}
 
-	fmt.Fprintf(os.Stdout, "Unknown help topic %#q.  Run 'pagedump help'.\n", arg)
+	fmt.Fprintf(os.Stdout, "Unknown help topic %#q.  Run 'pd help'.\n", arg)
 	os.Exit(2)
 }
 
@@ -131,6 +131,6 @@ func main() {
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "pagedump: unknown subcommand %q\nRun 'pagedump help' for usage.\n", args[0])
+	fmt.Fprintf(os.Stderr, "pd: unknown subcommand %q\nRun 'pd help' for usage.\n", args[0])
 	os.Exit(2)
 }

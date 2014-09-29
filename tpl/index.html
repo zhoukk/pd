@@ -24,18 +24,22 @@
 		<div class="page-header">
 			<h1>WELCOME TO ZHOUKK.COM</h1>
 		</div>
-
-		<h2>最近更新</h2>
-		{{range .}}
-		<div class="well">
-			<a href="{{.permalink}}">
-				<h1>{{.title}}</h1>
-			</a>
-			{{.date}}
-			<br/>
-			{{.content}}
+		<div class="row">
+			<div class="col-xs-8">
+				<h2>最近更新</h2>
+				{{range .}}
+				<div class="well">
+					<a href="{{.permalink}}">
+						<h1>{{.title}}</h1>
+					</a>
+					{{.date}}
+					<br/>
+					{{.content}}
+				</div>
+				{{end}}
+			</div>
+			<div class="col-xs-4"></div>
 		</div>
-		{{end}}
 	</div>
 	{{template "footer.html"}}
 	<!--[if lt IE 9]>
