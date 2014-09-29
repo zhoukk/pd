@@ -19,77 +19,25 @@
 	</style>
 </head>
 <body>
-	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-					<span class="sr-only"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">ZHOUKK</a>
-			</div>
-			<div id="navbar" class="collapse navbar-collapse">
-				<ul class="nav navbar-nav">
-					<li class="active">
-						<a href="#">主页</a>
-					</li>
-					<li>
-						<a href="#about">关于</a>
-					</li>
-					<li>
-						<a href="#contact">联系</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</nav>
+	{{template "navbar.html"}}
 	<div class="container" role="main">
-		<header>
+		<div class="page-header">
 			<h1>WELCOME TO ZHOUKK.COM</h1>
-		</header>
+		</div>
 
-		{{.content}}
-
-		<a href="http://www.zhoukk.com#disqus_thread">Link</a>
-		<hr>
-		<div id="disqus_thread"></div>
-		<script type="text/javascript">
-	        var disqus_shortname = 'zhoukk';
-	        (function() {
-	            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-	            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	        })();
-        </script>
-		<noscript>
-			Please enable JavaScript to view the
-			<a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
-		</noscript>
-		<a href="http://disqus.com" class="dsq-brlink">
-			<span class="logo-disqus">加载评论中...</span>
-		</a>
-
-		<script type="text/javascript">
-		    var disqus_shortname = 'zhoukk';
-		    (function () {
-		        var s = document.createElement('script'); s.async = true;
-		        s.type = 'text/javascript';
-		        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-		        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-		    }());
-    	</script>
-
-		<footer>
-			<p class="pull-right">
-				<a href="#">返回顶部</a>
-			</p>
-			<p >copyright by zhoukk</p>
-		</footer>
-
+		<h2>最近更新</h2>
+		{{range .}}
+		<div class="well">
+			<a href="{{.permalink}}">
+				<h1>{{.title}}</h1>
+			</a>
+			{{.date}}
+			<br/>
+			{{.content}}
+		</div>
+		{{end}}
 	</div>
-
+	{{template "footer.html"}}
 	<!--[if lt IE 9]>
 	<script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 	<script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
