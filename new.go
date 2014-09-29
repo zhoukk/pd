@@ -51,7 +51,7 @@ func newApp(cmd *Command, args []string) {
 	mdata["date"] = t.Format("2006-01-02 15:04:05")
 	mdata["permalink"] = fmt.Sprintf("/%d/%d/%s.html", y, m, title)
 	mdata["description"] = ""
-	mdata["tags"] = ""
+	mdata["tags"] = "默认"
 	b, err := json.MarshalIndent(mdata, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
