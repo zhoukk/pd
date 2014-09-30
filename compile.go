@@ -144,6 +144,11 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 		post["next_url"] = (*next)["permalink"]
 		post["next_title"] = (*next)["title"]
 	}
+	ti, err := time.Parse("2006-01-02 15:04:05", post["date"].(string))
+	if err != nil {
+		return post, err
+	}
+	post["sdate"] = ti.Format("2006-01-02")
 	err = t.Execute(&buf, post)
 	if err != nil {
 		return post, err

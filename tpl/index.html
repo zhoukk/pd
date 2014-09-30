@@ -13,33 +13,22 @@
 	<style type="text/css">
 		body {
 			background-color: #CCC;
-			padding-top: 50px;
-			padding-bottom: 50px;
+			padding-top: 60px;
+			padding-bottom: 40px;
 		}
 	</style>
 </head>
 <body>
 	{{template "navbar.html"}}
 	<div class="container" role="main">
-		<div class="page-header">
+		<div class="header">
 			<h1>WELCOME TO ZHOUKK.COM</h1>
 		</div>
-		<div class="row">
-			<div class="col-xs-8">
-				<h2>最近更新</h2>
-				{{range .}}
-				<div class="well">
-					<a href="{{.permalink}}">
-						<h1>{{.title}}</h1>
-					</a>
-					{{.date}}
-					<br/>
-					{{.content}}
-				</div>
-				{{end}}
-			</div>
-			<div class="col-xs-4"></div>
-		</div>
+		{{range .}}
+		<h2>
+			<a href="{{.permalink}}">{{.title}} / {{.sdate}}</a>
+		</h2>
+		{{end}}
 	</div>
 	{{template "footer.html"}}
 	<!--[if lt IE 9]>
