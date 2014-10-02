@@ -10,25 +10,21 @@
 
 	<link rel="icon" href="/favicon.ico">
 	<link href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-	<style type="text/css">
-		body {
-			background-color: #CCC;
-			padding-top: 60px;
-			padding-bottom: 40px;
-		}
-	</style>
+	<link href="/css/zhoukk.css" rel="stylesheet">
 </head>
 <body>
 	{{template "navbar.html"}}
 	<div class="container" role="main">
-		<div class="header">
-			<h1>WELCOME TO ZHOUKK.COM</h1>
+		<div class="post-container">
+			<header><h1>WELCOME</h1></header>
+			<ul class="post-list">
+				{{range .}}
+				<li class="post-list-item">
+					<a href="{{.permalink}}"><h3>{{.title}}</h3><time>{{.sdate}}</time></a>
+				</li>
+				{{end}}
+			</ul>
 		</div>
-		{{range .}}
-		<h2>
-			<a href="{{.permalink}}">{{.title}} / {{.sdate}}</a>
-		</h2>
-		{{end}}
 	</div>
 	{{template "footer.html"}}
 	<!--[if lt IE 9]>
@@ -37,6 +33,7 @@
 	<![endif]-->
 	<script type="text/javascript"src="http://cdn.staticfile.org/jquery/1.11.1/jquery.min.js"></script>
 	<script type="text/javascript">window.jQuery||document.write('<script type="text/javascript" src="js/jquery.min.js"><\/script>')</script>
-<script type="text/javascript"src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript"src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript"src="/js/zhoukk.js"></script>
 </body>
 </html>
