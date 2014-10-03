@@ -1,0 +1,20 @@
+<ul class="pager">
+	{{if .previous_url}}
+	<li class="previous">
+		<a href="{{.previous_url}}" title="{{.previous_title}}">&larr; 上一页</a>
+	</li>
+	{{else}}
+	<li class="previous disabled">
+		<a>&larr; 上一页</a>
+	</li>
+	{{end}}
+	{{if .next_url}}
+	<li class="next">
+		<a href="{{.next_url}}" title="{{.next_title}}">下一页 &rarr;</a>
+	</li>
+	{{else}}
+	<li class="next disabled">
+		<a>下一页 &rarr;</a>
+	</li>
+	{{end}}
+</ul>

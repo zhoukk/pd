@@ -1,0 +1,31 @@
+{{template "base.html" .}}
+{{define "meta"}}
+<meta name="author" content="{{.config.Author}}">
+{{end}}
+{{define "link"}}
+<link href="/theme/{{.config.Theme}}/css/zhoukk.css" rel="stylesheet">
+{{end}}
+{{define "head"}}
+<title>{{.Title}}</title>
+{{end}}
+{{define "body"}}
+<div class="container" role="main">
+	<div class="content">
+		<div class="page-header">
+			<h1></h1>
+		</div>
+		<div class="post-content">
+			<ul class="post-list">
+				{{range .posts}}
+				<li class="post-list-item">
+					<a href="{{.permalink}}">
+						<h3>{{.title}}</h3>
+						<time>{{.sdate}}</time>
+					</a>
+				</li>
+				{{end}}
+			</ul>
+		</div>
+	</div>
+</div>
+{{end}}

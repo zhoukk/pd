@@ -1,0 +1,4 @@
+{
+	"index": ["index.html", "head.html", "navbar.html", "footer.html", "base.html"],
+	"post": ["post.html", "head.html", "navbar.html", "footer.html", "base.html", "paginator.html", "comment.html"]
+}

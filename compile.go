@@ -24,6 +24,17 @@ compile markdown file to html file.
 `,
 }
 
+type Config struct {
+	Author string `json:"author"`
+	Theme  string `json:"theme"`
+	Title  string `json:"title"`
+}
+
+var (
+	config Config
+	theme  Mapper
+)
+
 type Posts []Mapper
 
 func (p Posts) Len() int {
@@ -54,6 +65,16 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
+	err := loadConf()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
+	err = loadTheme()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		return
+	}
 	posts, err := loadPosts()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -79,7 +100,35 @@ func compileApp(cmd *Command, args []string) {
 		}
 		posts[i] = p
 	}
-	createIndex(posts)
+	if err := createIndex(posts); err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
+}
+
+func loadConf() error {
+	f, err := os.Open("config.json")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	err = json.NewDecoder(f).Decode(&config)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func loadTheme() error {
+	f, err := os.Open("./theme/" + config.Theme + "/theme.json")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	err = json.NewDecoder(f).Decode(&theme)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func loadPosts() (Posts, error) {
@@ -132,7 +181,12 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	}
 	content := post["content"].(string)
 	post["content"] = template.HTML(MarkdownToHtml(content))
-	t, err := template.ParseFiles("./tpl/post.html", "./tpl/paginator.html", "./tpl/comment.html", "./tpl/navbar.html", "./tpl/footer.html")
+
+	var files []string
+	for _, v := range theme["post"].([]interface{}) {
+		files = append(files, "./theme/"+config.Theme+"/"+v.(string))
+	}
+	t, err := template.ParseFiles(files...)
 	if err != nil {
 		return post, err
 	}
@@ -149,7 +203,7 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 		return post, err
 	}
 	post["sdate"] = ti.Format("2006-01-02")
-	err = t.Execute(&buf, post)
+	err = t.Execute(&buf, Mapper{"post": post, "config": config, "title": post["title"]})
 	if err != nil {
 		return post, err
 	}
@@ -159,11 +213,15 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 
 func createIndex(posts Posts) error {
 	var buf bytes.Buffer
-	t, err := template.ParseFiles("./tpl/index.html", "./tpl/navbar.html", "./tpl/footer.html")
+	var files []string
+	for _, v := range theme["index"].([]interface{}) {
+		files = append(files, "./theme/"+config.Theme+"/"+v.(string))
+	}
+	t, err := template.ParseFiles(files...)
 	if err != nil {
 		return err
 	}
-	err = t.Execute(&buf, posts)
+	err = t.Execute(&buf, Mapper{"posts": posts, "config": config, "title": config.Title})
 	if err != nil {
 		return err
 	}

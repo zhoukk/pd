@@ -6,36 +6,33 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="renderer" content="webkit">
 	<meta name="author" content="zhoukk">
-	<title>{{.title}}</title>
+	<title>zhoukk</title>
 
 	<link rel="icon" href="/favicon.ico">
 	<link href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-	<style type="text/css">
-		body {
-			background-color: #CCC;
-			padding-top: 50px;
-			padding-bottom: 50px;
-		}
-	</style>
-</head>
+	<link href="/css/zhoukk.css" rel="stylesheet"></head>
 <body>
 	{{template "navbar.html"}}
 	<div class="container" role="main">
-		<div class="row">
-			<div class="col-xs-10">
-				<h1>{{.title}}</h1>
-				<br/>
-				{{.content}}
-				{{template "paginator.html" .}}
-				<hr>{{template "comment.html"}}</div>
-			<div class="col-xs-2">
-				<span class="label label-primary">{{.tags}}</span>
-				<br/>
-				{{.description}}
+		<div class="content">
+			<div class="page-header">
+				<h1>WELCOME</h1>
+			</div>
+			<div class="post-content">
+				<ul class="post-list">
+					{{range .}}
+					<li class="post-list-item">
+						<a href="{{.permalink}}">
+							<h3>{{.title}}</h3>
+							<time>{{.sdate}}</time>
+						</a>
+					</li>
+					{{end}}
+				</ul>
 			</div>
 		</div>
+		{{template "footer.html"}}
 	</div>
-	{{template "footer.html"}}
 	<!--[if lt IE 9]>
 	<script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 	<script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
@@ -43,5 +40,6 @@
 	<script type="text/javascript"src="http://cdn.staticfile.org/jquery/1.11.1/jquery.min.js"></script>
 	<script type="text/javascript">window.jQuery||document.write('<script type="text/javascript" src="js/jquery.min.js"><\/script>')</script>
 <script type="text/javascript"src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript"src="/js/zhoukk.js"></script>
 </body>
 </html>
