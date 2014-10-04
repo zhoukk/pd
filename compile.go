@@ -100,6 +100,12 @@ func compileApp(cmd *Command, args []string) {
 	if err := createIndex(posts); err != nil {
 		log.Fatalln(err.Error())
 	}
+	if err := createArchive(posts); err != nil {
+		log.Fatalln(err.Error())
+	}
+	if err := createAbout(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }
 
 func loadConf() error {
@@ -219,5 +225,35 @@ func createIndex(posts Posts) error {
 		return err
 	}
 	err = ioutil.WriteFile("./index.html", buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func createArchive(posts Posts) error {
+	var buf bytes.Buffer
+	t, err := tpl.Clone()
+	if err != nil {
+		return err
+	}
+	t = template.Must(t.ParseFiles("./theme/" + theme + "/archive.html"))
+	err = t.Execute(&buf, Mapper{"posts": posts, "config": config})
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("./archive.html", buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func createAbout() error {
+	var buf bytes.Buffer
+	t, err := tpl.Clone()
+	if err != nil {
+		return err
+	}
+	t = template.Must(t.ParseFiles("./theme/" + theme + "/about.html"))
+	err = t.Execute(&buf, Mapper{"config": config})
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("./about.html", buf.Bytes(), os.ModePerm)
 	return err
 }

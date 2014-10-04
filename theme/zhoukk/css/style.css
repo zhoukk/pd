@@ -7,9 +7,40 @@ footer {
 	text-align: center;
 }
 
+nav {
+	text-align: center;
+	padding-top: 80px;
+}
+
+nav ul {
+	list-style: none;
+	margin: auto;
+	width: 70%;
+}
+
+nav li {
+	display: inline-block;
+	font-weight: 700;
+	margin: 0 10px;
+}
+
+nav a {
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-ms-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+	color: #f03838;
+	text-decoration: none;
+}
+
+nav a:hover {
+	color: #000;
+}
+
 .post-content {
-	margin: 0 auto;
-	max-width: 800px;
+	margin: auto;
+	width: 70%;
 }
 
 .post-list {
@@ -26,10 +57,13 @@ footer {
 .post-list-item a {
 	-webkit-transition: all 0.2s ease-in-out;
 	-moz-transition: all 0.2s ease-in-out;
+	-ms-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
 	transition: all 0.2s ease-in-out;
 	display: block;
 	padding: 20px 5px;
 	color: #000;
+	text-decoration: none;
 }
 
 .post-list-item a:hover {
@@ -41,7 +75,6 @@ footer {
 .post-list-item h3 {
 	display: inline-block;
 	margin: 0;
-	text-transform: none;
 }
 
 .post-list-item time {
@@ -50,6 +83,38 @@ footer {
 
 .post-list-item time:before {
 	content: " / ";
+}
+
+.page-header {
+	text-align: center;
+}
+
+.pager {
+	list-style: none;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+
+.pager a {
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-ms-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+	color: #000;
+	text-decoration: none;
+}
+
+.pager .disabled {
+	display: none;
+}
+
+.pager .previous {
+	float: left;
+}
+
+.pager .next {
+	float: right;
 }
 
 .backToTop {

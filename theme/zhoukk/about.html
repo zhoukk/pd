@@ -1,0 +1,13 @@
+{{template "base.html" .}}
+{{define "meta"}}
+<meta name="author" content="{{.config.author}}">
+{{end}}
+{{define "link"}}
+<link href="/theme/{{.config.theme}}/css/style.css" rel="stylesheet">
+{{end}}
+{{define "head"}}
+<title>{{.config.title}}</title>
+{{end}}
+{{define "body"}}
+about
+{{end}}

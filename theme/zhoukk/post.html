@@ -15,17 +15,9 @@
 			<h1>{{.post.title}}</h1>
 		</div>
 		<div class="post-content">
-			<div class="row">
-				<div class="col-xs-10">
-					<br/>
-					{{.post.content}}{{template "paginator.html" .}}
-					<hr>{{template "disqus.html"}}</div>
-				<div class="col-xs-2">
-					<span class="label label-primary">{{.post.tags}}</span>
-					<br/>
-					{{.post.description}}
-				</div>
-			</div>
+			{{.post.content}}
+			{{template "paginator.html" .}}
+			{{template "disqus.html"}}
 		</div>
 	</div>
 </div>
