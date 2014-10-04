@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -24,15 +25,10 @@ compile markdown file to html file.
 `,
 }
 
-type Config struct {
-	Author string `json:"author"`
-	Theme  string `json:"theme"`
-	Title  string `json:"title"`
-}
-
 var (
-	config Config
-	theme  Mapper
+	theme  string
+	config Mapper
+	tpl    *template.Template
 )
 
 type Posts []Mapper
@@ -62,22 +58,23 @@ func (p Posts) Swap(i, j int) {
 func init() {
 	compileCmd.Run = compileApp
 	AddCommand(compileCmd)
+	log.SetFlags(log.Lshortfile)
 }
 
 func compileApp(cmd *Command, args []string) {
 	err := loadConf()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Fatalln(err.Error())
 		return
 	}
 	err = loadTheme()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Fatalln(err.Error())
 		return
 	}
 	posts, err := loadPosts()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Fatalln(err.Error())
 		return
 	}
 
@@ -95,13 +92,13 @@ func compileApp(cmd *Command, args []string) {
 		}
 		p, err := createPost(v, prev, next)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
+			log.Fatalln(err.Error())
 			continue
 		}
 		posts[i] = p
 	}
 	if err := createIndex(posts); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Fatalln(err.Error())
 	}
 }
 
@@ -115,20 +112,24 @@ func loadConf() error {
 	if err != nil {
 		return err
 	}
+	theme = config["theme"].(string)
 	return nil
 }
 
 func loadTheme() error {
-	f, err := os.Open("./theme/" + config.Theme + "/theme.json")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	err = json.NewDecoder(f).Decode(&theme)
-	if err != nil {
-		return err
-	}
-	return nil
+	var tplfiles []string
+	err := filepath.Walk("./theme/"+theme+"/base/", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") || !strings.HasSuffix(path, ".html") {
+			return nil
+		}
+		tplfiles = append(tplfiles, path)
+		return nil
+	})
+	tpl = template.Must(template.ParseFiles(tplfiles...))
+	return err
 }
 
 func loadPosts() (Posts, error) {
@@ -143,7 +144,6 @@ func loadPosts() (Posts, error) {
 		}
 		post, err := loadPost(path)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
 			return err
 		}
 		post["path"] = path
@@ -181,15 +181,6 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	}
 	content := post["content"].(string)
 	post["content"] = template.HTML(MarkdownToHtml(content))
-
-	var files []string
-	for _, v := range theme["post"].([]interface{}) {
-		files = append(files, "./theme/"+config.Theme+"/"+v.(string))
-	}
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		return post, err
-	}
 	if prev != nil {
 		post["previous_url"] = (*prev)["permalink"]
 		post["previous_title"] = (*prev)["title"]
@@ -203,7 +194,12 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 		return post, err
 	}
 	post["sdate"] = ti.Format("2006-01-02")
-	err = t.Execute(&buf, Mapper{"post": post, "config": config, "title": post["title"]})
+	t, err := tpl.Clone()
+	if err != nil {
+		return post, err
+	}
+	t = template.Must(t.ParseFiles("./theme/" + theme + "/post.html"))
+	err = t.Execute(&buf, Mapper{"post": post, "config": config})
 	if err != nil {
 		return post, err
 	}
@@ -213,15 +209,12 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 
 func createIndex(posts Posts) error {
 	var buf bytes.Buffer
-	var files []string
-	for _, v := range theme["index"].([]interface{}) {
-		files = append(files, "./theme/"+config.Theme+"/"+v.(string))
-	}
-	t, err := template.ParseFiles(files...)
+	t, err := tpl.Clone()
 	if err != nil {
 		return err
 	}
-	err = t.Execute(&buf, Mapper{"posts": posts, "config": config, "title": config.Title})
+	t = template.Must(t.ParseFiles("./theme/" + theme + "/index.html"))
+	err = t.Execute(&buf, Mapper{"posts": posts, "config": config})
 	if err != nil {
 		return err
 	}

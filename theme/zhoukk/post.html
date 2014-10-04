@@ -1,12 +1,12 @@
 {{template "base.html" .}}
 {{define "meta"}}
-<meta name="author" content="{{.config.Author}}">
+<meta name="author" content="{{.config.author}}">
 {{end}}
 {{define "link"}}
-<link href="/theme/{{.config.Theme}}/css/zhoukk.css" rel="stylesheet">
+<link href="/theme/{{.config.theme}}/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.Title}}</title>
+<title>{{.post.title}}</title>
 {{end}}
 {{define "body"}}
 <div class="container" role="main">
@@ -19,7 +19,7 @@
 				<div class="col-xs-10">
 					<br/>
 					{{.post.content}}{{template "paginator.html" .}}
-					<hr>{{template "comment.html"}}</div>
+					<hr>{{template "disqus.html"}}</div>
 				<div class="col-xs-2">
 					<span class="label label-primary">{{.post.tags}}</span>
 					<br/>
