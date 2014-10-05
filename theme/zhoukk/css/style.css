@@ -3,13 +3,19 @@ body {
 }
 
 footer {
-	margin-top: 20px;
+	margin-top: 40px;
 	text-align: center;
 }
 
 nav {
 	text-align: center;
 	padding-top: 80px;
+	padding-bottom: 20px;
+}
+
+nav audio {
+	float: right;
+	margin-top: -80px;
 }
 
 nav ul {
@@ -38,9 +44,24 @@ nav a:hover {
 	color: #000;
 }
 
-.post-content {
-	margin: auto;
-	width: 70%;
+header {
+	margin-bottom: 80px;
+	text-align: center;
+}
+
+header h1 {
+	font-size: 52px;
+	font-weight: 700;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 780px;
+}
+
+article p {
+	line-height: 1.8;
+	font-size: 18px;
 }
 
 .post-list {
@@ -83,10 +104,6 @@ nav a:hover {
 
 .post-list-item time:before {
 	content: " / ";
-}
-
-.page-header {
-	text-align: center;
 }
 
 .pager {

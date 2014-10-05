@@ -10,15 +10,13 @@
 {{end}}
 {{define "body"}}
 <div class="container" role="main">
-	<div class="content">
-		<div class="page-header">
-			<h1>{{.post.title}}</h1>
-		</div>
-		<div class="post-content">
-			{{.post.content}}
-			{{template "paginator.html" .}}
-			{{template "disqus.html"}}
-		</div>
-	</div>
+	<header>
+		<h1>{{.post.title}}</h1>
+	</header>
+	<article>
+		{{.post.content}}
+		{{template "paginator.html" .}}
+		{{template "disqus.html" .}}
+	</article>
 </div>
 {{end}}
