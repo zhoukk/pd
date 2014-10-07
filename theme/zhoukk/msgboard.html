@@ -6,7 +6,13 @@
 <link href="/theme/{{.config.theme}}/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.config.title}}</title>
+<title>{{.post.title}}</title>
 {{end}}
 {{define "body"}}
+<div class="container" role="main">
+	<header>
+		<h1>留言板</h1>
+	</header>
+	{{template "disqus.html" .}}
+</div>
 {{end}}

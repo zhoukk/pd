@@ -81,14 +81,14 @@ func compileApp(cmd *Command, args []string) {
 	var prev, next *Mapper
 	for i, v := range posts {
 		if i > 0 {
-			prev = &posts[i-1]
-		} else {
-			prev = nil
-		}
-		if i < len(posts)-1 {
-			next = &posts[i+1]
+			next = &posts[i-1]
 		} else {
 			next = nil
+		}
+		if i < len(posts)-1 {
+			prev = &posts[i+1]
+		} else {
+			prev = nil
 		}
 		p, err := createPost(v, prev, next)
 		if err != nil {
@@ -104,6 +104,9 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 	}
 	if err := createAbout(); err != nil {
+		log.Fatalln(err.Error())
+	}
+	if err := createMsgBoard(); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
@@ -255,5 +258,20 @@ func createAbout() error {
 		return err
 	}
 	err = ioutil.WriteFile("./about.html", buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func createMsgBoard() error {
+	var buf bytes.Buffer
+	t, err := tpl.Clone()
+	if err != nil {
+		return err
+	}
+	t = template.Must(t.ParseFiles("./theme/" + theme + "/msgboard.html"))
+	err = t.Execute(&buf, Mapper{"config": config})
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("./msgboard.html", buf.Bytes(), os.ModePerm)
 	return err
 }

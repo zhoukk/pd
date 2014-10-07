@@ -1,8 +1,8 @@
 {
-  "date": "2014-09-29 19:50:24",
+  "date": "2014-08-30 19:50:24",
   "description": "关于本小站",
-  "permalink": "/2014/9/first.html",
-  "tags": "",
+  "permalink": "/2014/8/first.html",
+  "tags": "默认",
   "title": "第一篇"
 }
 
