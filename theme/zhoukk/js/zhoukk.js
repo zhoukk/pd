@@ -15,4 +15,6 @@ $(document).ready(function() {
     };
     $(window).bind("scroll", $backToTopFun);
     $backToTopFun();
+
+    $(document).pjax('a', '#pjax-container')
 });

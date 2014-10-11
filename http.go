@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 )
 
@@ -25,6 +26,21 @@ func httpApp(cmd *Command, args []string) {
 	if len(args) > 0 {
 		port = args[0]
 	}
+	LoadConf()
+	LoadTheme()
 	fmt.Printf("http listen at %s\n", port)
-	http.ListenAndServe(port, http.FileServer(http.Dir("./")))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("X-PJAX") == "true" {
+			fmt.Println(r.URL.Path)
+			t, _ := Tpl.Clone()
+			t = template.Must(t.ParseFiles("./theme/" + theme + "/post.html"))
+			err := t.ExecuteTemplate(w, "body", Mapper{"config": Config})
+			if err != nil {
+				fmt.Println(err)
+			}
+			return
+		}
+		http.FileServer(http.Dir("./")).ServeHTTP(w, r)
+	})
+	http.ListenAndServe(port, nil)
 }

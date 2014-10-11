@@ -27,8 +27,8 @@ compile markdown file to html file.
 
 var (
 	theme  string
-	config Mapper
-	tpl    *template.Template
+	Config Mapper
+	Tpl    *template.Template
 )
 
 type Posts []Mapper
@@ -62,12 +62,12 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
-	err := loadConf()
+	err := LoadConf()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
 	}
-	err = loadTheme()
+	err = LoadTheme()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -111,21 +111,21 @@ func compileApp(cmd *Command, args []string) {
 	}
 }
 
-func loadConf() error {
+func LoadConf() error {
 	f, err := os.Open("config.json")
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	err = json.NewDecoder(f).Decode(&config)
+	err = json.NewDecoder(f).Decode(&Config)
 	if err != nil {
 		return err
 	}
-	theme = config["theme"].(string)
+	theme = Config["theme"].(string)
 	return nil
 }
 
-func loadTheme() error {
+func LoadTheme() error {
 	var tplfiles []string
 	err := filepath.Walk("./theme/"+theme+"/base/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -137,7 +137,7 @@ func loadTheme() error {
 		tplfiles = append(tplfiles, path)
 		return nil
 	})
-	tpl = template.Must(template.ParseFiles(tplfiles...))
+	Tpl = template.Must(template.ParseFiles(tplfiles...))
 	return err
 }
 
@@ -203,12 +203,12 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 		return post, err
 	}
 	post["sdate"] = ti.Format("2006-01-02")
-	t, err := tpl.Clone()
+	t, err := Tpl.Clone()
 	if err != nil {
 		return post, err
 	}
 	t = template.Must(t.ParseFiles("./theme/" + theme + "/post.html"))
-	err = t.Execute(&buf, Mapper{"post": post, "config": config})
+	err = t.Execute(&buf, Mapper{"post": post, "config": Config})
 	if err != nil {
 		return post, err
 	}
@@ -218,12 +218,12 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 
 func createIndex(posts Posts) error {
 	var buf bytes.Buffer
-	t, err := tpl.Clone()
+	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles("./theme/" + theme + "/index.html"))
-	err = t.Execute(&buf, Mapper{"posts": posts, "config": config})
+	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -233,12 +233,12 @@ func createIndex(posts Posts) error {
 
 func createArchive(posts Posts) error {
 	var buf bytes.Buffer
-	t, err := tpl.Clone()
+	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles("./theme/" + theme + "/archive.html"))
-	err = t.Execute(&buf, Mapper{"posts": posts, "config": config})
+	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -248,12 +248,12 @@ func createArchive(posts Posts) error {
 
 func createAbout() error {
 	var buf bytes.Buffer
-	t, err := tpl.Clone()
+	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles("./theme/" + theme + "/about.html"))
-	err = t.Execute(&buf, Mapper{"config": config})
+	err = t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
@@ -263,12 +263,12 @@ func createAbout() error {
 
 func createMsgBoard() error {
 	var buf bytes.Buffer
-	t, err := tpl.Clone()
+	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles("./theme/" + theme + "/msgboard.html"))
-	err = t.Execute(&buf, Mapper{"config": config})
+	err = t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
