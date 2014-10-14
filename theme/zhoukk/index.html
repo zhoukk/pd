@@ -3,29 +3,27 @@
 <meta name="author" content="{{.config.author}}">
 {{end}}
 {{define "link"}}
-<link href="/theme/{{.config.theme}}/css/style.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
 <title>{{.config.title}}</title>
 {{end}}
-<div id="pjax-container">
-	{{define "body"}}
-	<div class="container" role="main">
-		<header>
-			<h1></h1>
-		</header>
-		<article>
-			<ul class="post-list">
-				{{range .posts}}
-				<li class="post-list-item">
-					<a href="{{.permalink}}">
-						<h3>{{.title}}</h3>
-						<time>{{.sdate}}</time>
-					</a>
-				</li>
-				{{end}}
-			</ul>
-		</article>
-	</div>
-	{{end}}
+{{define "body"}}
+<div class="container" role="main">
+	<header>
+		<h1></h1>
+	</header>
+	<article>
+		<ul class="post-list">
+			{{range .posts}}
+			<li class="post-list-item">
+				<a href="{{.permalink}}">
+					<h3>{{.title}}</h3>
+					<time>{{.sdate}}</time>
+				</a>
+			</li>
+			{{end}}
+		</ul>
+	</article>
 </div>
+{{end}}

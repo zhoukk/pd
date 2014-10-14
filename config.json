@@ -1,5 +1,7 @@
 {
 	"author" : "zhoukk",
-	"theme" : "zhoukk",
-	"title" : "zhoukk"
+	"theme" : "./theme/zhoukk/",
+	"title" : "zhoukk",
+	"input" : "../zhoukk.github.io/post/",
+	"output" : "../zhoukk.github.io/"
 }

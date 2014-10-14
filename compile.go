@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,7 +17,7 @@ import (
 )
 
 var compileCmd = &Command{
-	UsageLine: "compile",
+	UsageLine: "compile config.json",
 	Short:     "compile whole website",
 	Long: `
 compile all markdown file in post.
@@ -26,9 +27,11 @@ compile markdown file to html file.
 }
 
 var (
-	theme  string
-	Config Mapper
-	Tpl    *template.Template
+	Theme      string
+	InputPath  string
+	OutputPath string
+	Config     Mapper
+	Tpl        *template.Template
 )
 
 type Posts []Mapper
@@ -62,7 +65,11 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
-	err := LoadConf()
+	config_file := "config.json"
+	if len(args) > 0 {
+		config_file = args[0]
+	}
+	err := LoadConf(config_file)
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -72,7 +79,7 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 		return
 	}
-	posts, err := loadPosts()
+	posts, err := LoadPosts()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -90,29 +97,32 @@ func compileApp(cmd *Command, args []string) {
 		} else {
 			prev = nil
 		}
-		p, err := createPost(v, prev, next)
+		p, err := CreatePost(v, prev, next)
 		if err != nil {
 			log.Fatalln(err.Error())
 			continue
 		}
 		posts[i] = p
 	}
-	if err := createIndex(posts); err != nil {
+	if err := CreateIndex(posts); err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := createArchive(posts); err != nil {
+	if err := CreateArchive(posts); err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := createAbout(); err != nil {
+	if err := CreateAbout(); err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := createMsgBoard(); err != nil {
+	if err := CreateMsgBoard(); err != nil {
+		log.Fatalln(err.Error())
+	}
+	if err := CopyJsCssImg(); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
-func LoadConf() error {
-	f, err := os.Open("config.json")
+func LoadConf(config_file string) error {
+	f, err := os.Open(config_file)
 	if err != nil {
 		return err
 	}
@@ -121,13 +131,15 @@ func LoadConf() error {
 	if err != nil {
 		return err
 	}
-	theme = Config["theme"].(string)
+	Theme = Config["theme"].(string)
+	InputPath = Config["input"].(string)
+	OutputPath = Config["output"].(string)
 	return nil
 }
 
 func LoadTheme() error {
 	var tplfiles []string
-	err := filepath.Walk("./theme/"+theme+"/base/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(Theme+"/base/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -141,17 +153,17 @@ func LoadTheme() error {
 	return err
 }
 
-func loadPosts() (Posts, error) {
+func LoadPosts() (Posts, error) {
 	posts := Posts{}
 
-	err := filepath.Walk("./post/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(InputPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
 			return nil
 		}
-		post, err := loadPost(path)
+		post, err := LoadPost(path)
 		if err != nil {
 			return err
 		}
@@ -164,7 +176,7 @@ func loadPosts() (Posts, error) {
 	return posts, err
 }
 
-func loadPost(path string) (post Mapper, err error) {
+func LoadPost(path string) (post Mapper, err error) {
 	post = make(Mapper, 0)
 	content, err := ioutil.ReadFile(path)
 	n := strings.IndexRune(string(content), '}')
@@ -181,9 +193,9 @@ func loadPost(path string) (post Mapper, err error) {
 	return
 }
 
-func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
+func CreatePost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	var buf bytes.Buffer
-	link := "." + post["permalink"].(string)
+	link := filepath.Join(OutputPath, post["permalink"].(string))
 	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
 	if err != nil {
 		return post, err
@@ -207,7 +219,7 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	if err != nil {
 		return post, err
 	}
-	t = template.Must(t.ParseFiles("./theme/" + theme + "/post.html"))
+	t = template.Must(t.ParseFiles(Theme + "/post.html"))
 	err = t.Execute(&buf, Mapper{"post": post, "config": Config})
 	if err != nil {
 		return post, err
@@ -216,62 +228,126 @@ func createPost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	return post, err
 }
 
-func createIndex(posts Posts) error {
+func CreateIndex(posts Posts) error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
-	t = template.Must(t.ParseFiles("./theme/" + theme + "/index.html"))
+	t = template.Must(t.ParseFiles(Theme + "/index.html"))
 	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("./index.html", buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "index.html"), buf.Bytes(), os.ModePerm)
 	return err
 }
 
-func createArchive(posts Posts) error {
+func CreateArchive(posts Posts) error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
-	t = template.Must(t.ParseFiles("./theme/" + theme + "/archive.html"))
+	t = template.Must(t.ParseFiles(Theme + "/archive.html"))
 	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("./archive.html", buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "archive.html"), buf.Bytes(), os.ModePerm)
 	return err
 }
 
-func createAbout() error {
+func CreateAbout() error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
-	t = template.Must(t.ParseFiles("./theme/" + theme + "/about.html"))
+	t = template.Must(t.ParseFiles(Theme + "/about.html"))
 	err = t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("./about.html", buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "about.html"), buf.Bytes(), os.ModePerm)
 	return err
 }
 
-func createMsgBoard() error {
+func CreateMsgBoard() error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
-	t = template.Must(t.ParseFiles("./theme/" + theme + "/msgboard.html"))
+	t = template.Must(t.ParseFiles(Theme + "/msgboard.html"))
 	err = t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile("./msgboard.html", buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "msgboard.html"), buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func CopyJsCssImg() error {
+	if err := CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "js")); err != nil {
+		return err
+	}
+	if err := CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "css")); err != nil {
+		return err
+	}
+	if err := CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "img")); err != nil {
+		return err
+	}
+	return nil
+}
+
+func CopyDir(srcpath, dstpath string) error {
+	srcinfo, err := os.Stat(srcpath)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(dstpath, srcinfo.Mode())
+	if err != nil {
+		return err
+	}
+	dir, _ := os.Open(srcpath)
+	objs, err := dir.Readdir(-1)
+	for _, obj := range objs {
+		srcfile := filepath.Join(srcpath, obj.Name())
+		dstfile := filepath.Join(dstpath, obj.Name())
+
+		if obj.IsDir() {
+			err = CopyDir(srcfile, dstfile)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+		} else {
+			err = CopyFile(srcfile, dstfile)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+		}
+	}
+	return err
+}
+
+func CopyFile(srcName, dstName string) error {
+	src, err := os.Open(srcName)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	_, err = io.Copy(dst, src)
+	if err == nil {
+		srcinfo, err := os.Stat(srcName)
+		if err != nil {
+			err = os.Chmod(dstName, srcinfo.Mode())
+		}
+	}
 	return err
 }
