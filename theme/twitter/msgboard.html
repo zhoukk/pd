@@ -7,8 +7,13 @@
 <link href="/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.config.title}}</title>
+<title>留言板</title>
 {{end}}
 {{define "body"}}
-archive
+<div class="container" role="main">
+	<header>
+		<h1>留言板</h1>
+	</header>
+	{{template "disqus.html" .}}
+</div>
 {{end}}

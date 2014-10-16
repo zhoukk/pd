@@ -32,15 +32,16 @@ var (
 	OutputPath string
 	Config     Mapper
 	Tpl        *template.Template
+	Posts      AllPost
 )
 
-type Posts []Mapper
+type AllPost []Mapper
 
-func (p Posts) Len() int {
+func (p AllPost) Len() int {
 	return len(p)
 }
 
-func (p Posts) Less(i, j int) bool {
+func (p AllPost) Less(i, j int) bool {
 	p1 := p[i]["date"].(string)
 	p2 := p[j]["date"].(string)
 	pt1, err := time.Parse("2006-01-02 15:04:05", p1)
@@ -54,7 +55,7 @@ func (p Posts) Less(i, j int) bool {
 	return pt1.After(pt2)
 }
 
-func (p Posts) Swap(i, j int) {
+func (p AllPost) Swap(i, j int) {
 	p[i], p[j] = p[j], p[i]
 }
 
@@ -79,21 +80,21 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 		return
 	}
-	posts, err := LoadPosts()
+	err = LoadPosts()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
 	}
 
 	var prev, next *Mapper
-	for i, v := range posts {
+	for i, v := range Posts {
 		if i > 0 {
-			next = &posts[i-1]
+			next = &Posts[i-1]
 		} else {
 			next = nil
 		}
-		if i < len(posts)-1 {
-			prev = &posts[i+1]
+		if i < len(Posts)-1 {
+			prev = &Posts[i+1]
 		} else {
 			prev = nil
 		}
@@ -102,12 +103,12 @@ func compileApp(cmd *Command, args []string) {
 			log.Fatalln(err.Error())
 			continue
 		}
-		posts[i] = p
+		Posts[i] = p
 	}
-	if err := CreateIndex(posts); err != nil {
+	if err := CreateIndex(); err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := CreateArchive(posts); err != nil {
+	if err := CreateArchive(); err != nil {
 		log.Fatalln(err.Error())
 	}
 	if err := CreateAbout(); err != nil {
@@ -117,6 +118,12 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 	}
 	if err := CopyJsCssImg(); err != nil {
+		log.Fatalln(err.Error())
+	}
+	if err := CreateRss(); err != nil {
+		log.Fatalln(err.Error())
+	}
+	if err := CreateSitemap(); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
@@ -153,9 +160,7 @@ func LoadTheme() error {
 	return err
 }
 
-func LoadPosts() (Posts, error) {
-	posts := Posts{}
-
+func LoadPosts() error {
 	err := filepath.Walk(InputPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -168,12 +173,12 @@ func LoadPosts() (Posts, error) {
 			return err
 		}
 		post["path"] = path
-		posts = append(posts, post)
+		Posts = append(Posts, post)
 		return nil
 	})
 
-	sort.Sort(posts)
-	return posts, err
+	sort.Sort(Posts)
+	return err
 }
 
 func LoadPost(path string) (post Mapper, err error) {
@@ -228,14 +233,14 @@ func CreatePost(post Mapper, prev, next *Mapper) (Mapper, error) {
 	return post, err
 }
 
-func CreateIndex(posts Posts) error {
+func CreateIndex() error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles(Theme + "/index.html"))
-	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
+	err = t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -243,14 +248,14 @@ func CreateIndex(posts Posts) error {
 	return err
 }
 
-func CreateArchive(posts Posts) error {
+func CreateArchive() error {
 	var buf bytes.Buffer
 	t, err := Tpl.Clone()
 	if err != nil {
 		return err
 	}
 	t = template.Must(t.ParseFiles(Theme + "/archive.html"))
-	err = t.Execute(&buf, Mapper{"posts": posts, "config": Config})
+	err = t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
 	if err != nil {
 		return err
 	}

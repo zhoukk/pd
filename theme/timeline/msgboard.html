@@ -3,12 +3,16 @@
 <meta name="author" content="{{.config.author}}">
 {{end}}
 {{define "link"}}
-<link href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.config.title}}</title>
+<title>{{.post.title}}</title>
 {{end}}
 {{define "body"}}
-archive
+<div class="container" role="main">
+	<header>
+		<h1>留言板</h1>
+	</header>
+	{{template "disqus.html" .}}
+</div>
 {{end}}
