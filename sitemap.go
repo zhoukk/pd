@@ -31,7 +31,7 @@ func CreateSitemap() error {
 
 	r := &urlset{"http://www.sitemaps.org/schemas/sitemap/0.9", urls}
 	var buf bytes.Buffer
-	buf.WriteString(`<?xml version="1.0"?>`)
+	buf.WriteString(xml.Header)
 	data, err := xml.Marshal(r)
 	if err != nil {
 		return err

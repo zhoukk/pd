@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"os"
@@ -46,7 +45,7 @@ type Person struct {
 
 type Text struct {
 	Type string `xml:"type,attr"`
-	Body string `xml:",chardata"`
+	Body string `xml:",innerxml"`
 }
 
 func CreateAtom() error {
@@ -66,8 +65,7 @@ func CreateAtom() error {
 		if err != nil {
 			t = time.Now()
 		}
-		cont := string(v["content"].(template.HTML))
-		fmt.Println(cont)
+		body := string(v["content"].(template.HTML))
 		e := &Entry{
 			Title: v["title"].(string),
 			ID:    domain + permalink,
@@ -83,7 +81,7 @@ func CreateAtom() error {
 			},
 			Content: &Text{
 				Type: "html",
-				Body: cont,
+				Body: body,
 			},
 			Author: &Person{
 				Name: Config["author"].(string),
@@ -92,8 +90,8 @@ func CreateAtom() error {
 		feed.Entry = append(feed.Entry, e)
 	}
 	var buf bytes.Buffer
-	buf.WriteString(`<?xml version="1.0"?>`)
-	data, err := xml.Marshal(feed)
+	buf.WriteString(xml.Header)
+	data, err := xml.MarshalIndent(feed, "", " ")
 	if err != nil {
 		return err
 	}

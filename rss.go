@@ -43,7 +43,7 @@ func CreateRss() error {
 
 	r := &rss{"2.0", &RssChannel{Config["title"].(string), domain, time.Now().Format(time.RFC822), Config["description"].(string), items}}
 	var buf bytes.Buffer
-	buf.WriteString(`<?xml version="1.0"?>`)
+	buf.WriteString(xml.Header)
 	data, err := xml.Marshal(r)
 	if err != nil {
 		return err
