@@ -3,6 +3,7 @@
 	"author" : "zhoukk",
 	"theme" : "./theme/zhoukk/",
 	"title" : "zhoukk",
+	"description" : "zhoukk's page",
 	"input" : "../zhoukk.github.io/post/",
 	"output" : "../zhoukk.github.io/"
 }

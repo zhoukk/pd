@@ -15,10 +15,11 @@ type rss struct {
 }
 
 type RssChannel struct {
-	Title   string    `xml:"title"`
-	Link    string    `xml:"link"`
-	PubDate string    `xml:"pubDate"`
-	Items   []RssItem `xml:"item"`
+	Title       string    `xml:"title"`
+	Link        string    `xml:"link"`
+	PubDate     string    `xml:"pubDate"`
+	Description string    `xml:"description"`
+	Items       []RssItem `xml:"item"`
 }
 
 type RssItem struct {
@@ -32,11 +33,15 @@ func CreateRss() error {
 	domain := Config["domain"].(string)
 	items := make([]RssItem, 0)
 	for _, v := range Posts {
-		item := RssItem{v["title"].(string), domain + v["permalink"].(string), v["date"].(string), v["description"].(string)}
+		t, err := time.Parse("2006-01-02 15:04:05", v["date"].(string))
+		if err != nil {
+			t = time.Now()
+		}
+		item := RssItem{v["title"].(string), domain + v["permalink"].(string), t.Format(time.RFC822), v["description"].(string)}
 		items = append(items, item)
 	}
 
-	r := &rss{"2.0", &RssChannel{Config["title"].(string), domain, time.Now().Format(time.RFC822), items}}
+	r := &rss{"2.0", &RssChannel{Config["title"].(string), domain, time.Now().Format(time.RFC822), Config["description"].(string), items}}
 	var buf bytes.Buffer
 	buf.WriteString(`<?xml version="1.0"?>`)
 	data, err := xml.Marshal(r)

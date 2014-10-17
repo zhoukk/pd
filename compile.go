@@ -123,6 +123,9 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateRss(); err != nil {
 		log.Fatalln(err.Error())
 	}
+	if err := CreateAtom(); err != nil {
+		log.Fatalln(err.Error())
+	}
 	if err := CreateSitemap(); err != nil {
 		log.Fatalln(err.Error())
 	}
