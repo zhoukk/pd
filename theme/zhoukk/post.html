@@ -5,23 +5,21 @@
 <meta name="description" content="zhoukk, zhoukk.com, zhoukk's page">
 {{end}}
 {{define "link"}}
-<link href="/css/style.css" rel="stylesheet">
+<link href="/static/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
 <title>{{.post.title}}</title>
 {{end}}
-<div id="pjax-container">
-	{{define "body"}}
-	<div class="container" role="main">
-		<header>
-			<h1>{{.post.title}}</h1>
-			<small>{{.post.sdate}} - {{.post.tags}}</small>
-		</header>
-		<article>
-			{{.post.content}}
+{{define "body"}}
+<div class="container" role="main">
+	<header>
+		<h1>{{.post.title}}</h1>
+		<small>{{.post.sdate}} - {{.post.tags}}</small>
+	</header>
+	<article>
+		{{.post.content}}
 		{{template "paginator.html" .}}
-		</article>
-		{{template "disqus.html" .}}
-	</div>
-	{{end}}
+	</article>
+	{{template "disqus.html" .}}
 </div>
+{{end}}

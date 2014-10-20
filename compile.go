@@ -33,6 +33,7 @@ var (
 	Config     Mapper
 	Tpl        *template.Template
 	Posts      AllPost
+	Tags       map[string]AllPost
 )
 
 type AllPost []Mapper
@@ -70,6 +71,7 @@ func compileApp(cmd *Command, args []string) {
 	if len(args) > 0 {
 		config_file = args[0]
 	}
+	Tags = make(map[string]AllPost, 0)
 	err := LoadConf(config_file)
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -176,6 +178,11 @@ func LoadPosts() error {
 			return err
 		}
 		post["path"] = path
+		tag := post["tags"].(string)
+		if Tags[tag] == nil {
+			Tags[tag] = make(AllPost, 0)
+		}
+		Tags[tag] = append(Tags[tag], post)
 		Posts = append(Posts, post)
 		return nil
 	})
@@ -258,7 +265,7 @@ func CreateArchive() error {
 		return err
 	}
 	t = template.Must(t.ParseFiles(Theme + "/archive.html"))
-	err = t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
+	err = t.Execute(&buf, Mapper{"tags": Tags, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -297,13 +304,13 @@ func CreateMsgBoard() error {
 }
 
 func CopyJsCssImg() error {
-	if err := CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "js")); err != nil {
+	if err := CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "/static/js")); err != nil {
 		return err
 	}
-	if err := CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "css")); err != nil {
+	if err := CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "/static/css")); err != nil {
 		return err
 	}
-	if err := CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "img")); err != nil {
+	if err := CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "/static/img")); err != nil {
 		return err
 	}
 	return nil

@@ -19,11 +19,11 @@ $(document).ready(function() {
     $(document).pjax('a', '#pjax-container')
 
     $(document).on('pjax:send', function() {
-        $('#loading').show()
+        // $('#loading').show()
     })
 
     $(document).on('pjax:complete', function() {
-        $('#loading').hide()
+        // $('#loading').hide()
     })
 
     $(document).on('pjax:timeout', function(event) {

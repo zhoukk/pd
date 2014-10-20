@@ -5,10 +5,31 @@
 <meta name="description" content="zhoukk, zhoukk.com, zhoukk's page">
 {{end}}
 {{define "link"}}
-<link href="/css/style.css" rel="stylesheet">
+<link href="/static/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
 <title>{{.config.title}}</title>
 {{end}}
 {{define "body"}}
+<div class="container" role="main">
+	<header>
+		<h1></h1>
+	</header>
+	<article>
+		{{range $i,$v := .tags}}
+		<ul>
+			<li>
+				{{$i}}
+				<ul>
+					{{range $v}}
+					<li>
+						<a href="{{.permalink}}">{{.title}}</a>
+					</li>
+					{{end}}
+				</ul>
+			</li>
+		</ul>
+		{{end}}
+	</article>
+</div>
 {{end}}
