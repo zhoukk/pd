@@ -64,6 +64,7 @@ func init() {
 	compileCmd.Run = compileApp
 	AddCommand(compileCmd)
 	log.SetFlags(log.Lshortfile)
+	Tags = make(map[string]AllPost, 0)
 }
 
 func compileApp(cmd *Command, args []string) {
@@ -71,7 +72,6 @@ func compileApp(cmd *Command, args []string) {
 	if len(args) > 0 {
 		config_file = args[0]
 	}
-	Tags = make(map[string]AllPost, 0)
 	err := LoadConf(config_file)
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -87,25 +87,17 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 		return
 	}
-
-	var prev, next *Mapper
 	for i, v := range Posts {
-		if i > 0 {
-			next = &Posts[i-1]
-		} else {
-			next = nil
-		}
-		if i < len(Posts)-1 {
-			prev = &Posts[i+1]
-		} else {
-			prev = nil
-		}
-		p, err := CreatePost(v, prev, next)
+		p, err := CreatePost(v, i)
 		if err != nil {
 			log.Fatalln(err.Error())
 			continue
 		}
 		Posts[i] = p
+		if err := WritePostToFile(p); err != nil {
+			log.Fatalln(err.Error())
+			continue
+		}
 	}
 	if err := CreateIndex(); err != nil {
 		log.Fatalln(err.Error())
@@ -208,12 +200,17 @@ func LoadPost(path string) (post Mapper, err error) {
 	return
 }
 
-func CreatePost(post Mapper, prev, next *Mapper) (Mapper, error) {
-	var buf bytes.Buffer
-	link := filepath.Join(OutputPath, post["permalink"].(string))
-	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
-	if err != nil {
-		return post, err
+func CreatePost(post Mapper, i int) (Mapper, error) {
+	var prev, next *Mapper
+	if i > 0 {
+		next = &Posts[i-1]
+	} else {
+		next = nil
+	}
+	if i < len(Posts)-1 {
+		prev = &Posts[i+1]
+	} else {
+		prev = nil
 	}
 	content := post["content"].(string)
 	post["content"] = template.HTML(MarkdownToHtml(content))
@@ -230,17 +227,24 @@ func CreatePost(post Mapper, prev, next *Mapper) (Mapper, error) {
 		return post, err
 	}
 	post["sdate"] = ti.Format("2006-01-02")
-	t, err := Tpl.Clone()
+	return post, nil
+}
+
+func WritePostToFile(post Mapper) error {
+	var buf bytes.Buffer
+	link := filepath.Join(OutputPath, post["permalink"].(string))
+	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
 	if err != nil {
-		return post, err
+		return err
 	}
+	t, err := Tpl.Clone()
 	t = template.Must(t.ParseFiles(Theme + "/post.html"))
 	err = t.Execute(&buf, Mapper{"post": post, "config": Config})
 	if err != nil {
-		return post, err
+		return err
 	}
 	err = ioutil.WriteFile(link, buf.Bytes(), os.ModePerm)
-	return post, err
+	return err
 }
 
 func CreateIndex() error {

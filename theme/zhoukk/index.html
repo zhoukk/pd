@@ -11,7 +11,10 @@
 <title>{{.config.title}}</title>
 {{end}}
 {{define "body"}}
-<div class="container" role="main">
+<div id="pjax-container" class="container" role="main">
+	{{if .title}}
+	<title>{{.title}}</title>
+	{{end}}
 	<header>
 		<h1></h1>
 	</header>

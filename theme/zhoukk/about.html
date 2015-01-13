@@ -8,10 +8,13 @@
 <link href="/static/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.config.title}}</title>
+<title>关于</title>
 {{end}}
 {{define "body"}}
-<div class="container" role="main">
+<div id="pjax-container" class="container" role="main">
+	{{if .title}}
+	<title>{{.title}}</title>
+	{{end}}
 	<header>
 		<h1>关于</h1>
 	</header>
