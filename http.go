@@ -32,7 +32,7 @@ func httpApp(cmd *Command, args []string) {
 	}
 	LoadConf("config.json")
 	LoadTheme()
-	fmt.Printf("http listen at %s\n", port)
+	fmt.Printf("http listen at %s, root:%s\n", port, root)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-PJAX") == "true" {
 			fmt.Println(r.URL.Path)

@@ -7,30 +7,29 @@ footer {
 	text-align: center;
 }
 
-nav {
+.navbar nav {
 	text-align: center;
-	padding-top: 80px;
-	padding-bottom: 20px;
+	padding: 20px;
 }
 
-nav audio {
+.navbar nav audio {
 	float: right;
 	margin-top: -80px;
 }
 
-nav ul {
+.navbar nav ul {
 	list-style: none;
 	margin: auto;
 	width: 70%;
 }
 
-nav li {
+.navbar nav li {
 	display: inline-block;
 	font-weight: 700;
 	margin: 0 10px;
 }
 
-nav a {
+.navbar nav a {
 	-webkit-transition: all 0.2s ease-in-out;
 	-moz-transition: all 0.2s ease-in-out;
 	-ms-transition: all 0.2s ease-in-out;
@@ -40,12 +39,11 @@ nav a {
 	text-decoration: none;
 }
 
-nav a:hover {
+.navbar nav a:hover {
 	color: #000;
 }
 
 header {
-	margin-bottom: 80px;
 	text-align: center;
 }
 
@@ -56,7 +54,6 @@ header h1 {
 
 .container {
 	margin: 0 auto;
-	max-width: 780px;
 }
 
 article p {
@@ -65,7 +62,7 @@ article p {
 }
 
 .post-list {
-	padding: 20px;
+	margin: auto 200px;
 	list-style: none;
 }
 
@@ -104,6 +101,15 @@ article p {
 
 .post-list-item time:before {
 	content: " / ";
+}
+
+.post-content {
+	margin: auto 200px;
+}
+
+.tags-list {
+	margin: auto 200px;
+	list-style: none;
 }
 
 .pager {

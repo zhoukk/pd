@@ -119,6 +119,9 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateMsgBoard(); err != nil {
 		log.Fatalln(err.Error())
 	}
+	if err := CreateAlbum(); err != nil {
+		log.Fatalln(err.Error())
+	}
 	if err := CopyJsCssImg(); err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -300,6 +303,21 @@ func CreateMsgBoard() error {
 		return err
 	}
 	err = ioutil.WriteFile(filepath.Join(OutputPath, "msgboard.html"), buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func CreateAlbum() error {
+	var buf bytes.Buffer
+	t, err := Tpl.Clone()
+	if err != nil {
+		return err
+	}
+	t = template.Must(t.ParseFiles(Theme + "/album.html"))
+	err = t.Execute(&buf, Mapper{"config": Config})
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "album.html"), buf.Bytes(), os.ModePerm)
 	return err
 }
 

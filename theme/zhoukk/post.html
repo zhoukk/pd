@@ -12,14 +12,18 @@
 {{end}}
 {{define "body"}}
 <div class="container" role="main">
-	<header>
-		<h1>{{.post.title}}</h1>
-		<small>{{.post.sdate}} - {{.post.tags}}</small>
-	</header>
-	<article>
-		{{.post.content}}
-		{{template "paginator.html" .}}
-	</article>
-	{{template "disqus.html" .}}
+	<div class="post-content">
+		<header>
+			<h1>{{.post.title}}</h1>
+			<small>{{.post.sdate}} - {{.post.tags}}</small>
+		</header>
+		<article>
+			{{.post.content}}
+			{{template "paginator.html" .}}
+		</article>
+		{{template "disqus.html" .}}
+	</div>
 </div>
+{{end}}
+{{define "script"}}
 {{end}}

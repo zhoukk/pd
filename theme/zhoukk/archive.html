@@ -8,7 +8,7 @@
 <link href="/static/css/style.css" rel="stylesheet">
 {{end}}
 {{define "head"}}
-<title>{{.config.title}}</title>
+<title>存档</title>
 {{end}}
 {{define "body"}}
 <div class="container" role="main">
@@ -16,20 +16,24 @@
 		<h1></h1>
 	</header>
 	<article>
-		{{range $i,$v := .tags}}
-		<ul>
-			<li>
-				{{$i}}
-				<ul>
-					{{range $v}}
-					<li>
-						<a href="{{.permalink}}">{{.title}}</a>
-					</li>
-					{{end}}
-				</ul>
-			</li>
-		</ul>
-		{{end}}
+		<div class="tags-list">
+			{{range $i,$v := .tags}}
+			<ul>
+				<li>
+					{{$i}}
+					<ul>
+						{{range $v}}
+						<li>
+							<a href="{{.permalink}}">{{.title}}</a>
+						</li>
+						{{end}}
+					</ul>
+				</li>
+			</ul>
+			{{end}}
+		</div>
 	</article>
 </div>
+{{end}}
+{{define "script"}}
 {{end}}
