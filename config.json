@@ -1,9 +1,11 @@
 {
-	"domain" : "http://zhoukk.com",
-	"author" : "zhoukk",
-	"theme" : "./theme/zhoukk/",
-	"title" : "zhoukk",
-	"description" : "zhoukk's page",
-	"input" : "../zhoukk.github.io/post/",
-	"output" : "../zhoukk.github.io/"
+	"domain": "http://zhoukk.com",
+	"author": "zhoukk",
+	"theme": "./theme/zhoukk/",
+	"title": "zhoukk",
+	"description": "zhoukk's page",
+	"input": "../zhoukk.github.io/post/",
+	"output": "../zhoukk.github.io/",
+	"port": ":80",
+	"root": "../zhoukk.github.io"
 }

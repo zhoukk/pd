@@ -11,18 +11,21 @@
 <title>{{.post.title}}</title>
 {{end}}
 {{define "body"}}
-<div class="container" role="main">
-	<div class="post-content">
-		<header>
-			<h1>{{.post.title}}</h1>
-			<small>{{.post.sdate}} - {{.post.tags}}</small>
-		</header>
-		<article>
+<div id="pjax-container" class="container" role="main">
+	{{if .title}}
+	<title>{{.title}}</title>
+	{{end}}
+	<header>
+		<h1>{{.post.title}}</h1>
+		<small>{{.post.sdate}} - {{.post.tags}}</small>
+	</header>
+	<article>
+		<div class="post-content">
 			{{.post.content}}
 			{{template "paginator.html" .}}
-		</article>
-		{{template "disqus.html" .}}
-	</div>
+			{{template "disqus.html" .}}
+		</div>
+	</article>
 </div>
 {{end}}
 {{define "script"}}
