@@ -1,0 +1,27 @@
+{{template "base.html" .}}
+{{define "meta"}}
+<meta name="author" content="{{.config.author}}">
+<meta name="keywords" content="zhoukk, zhoukk.com">
+<meta name="description" content="zhoukk, zhoukk.com, zhoukk's page">
+{{end}}
+{{define "link"}}
+<link href="/static/css/style.css" rel="stylesheet">
+{{end}}
+{{define "head"}}
+<title>视频</title>
+{{end}}
+{{define "body"}}
+<div id="pjax-container" class="container" role="main">
+	{{if .title}}
+	<title>{{.title}}</title>
+	{{end}}
+	<header>
+		<h1>视频</h1>
+	</header>
+	<article align="center">
+		<video src="video/2015-3-6-21-27-0.mov" preload="auto" controls="controls"></video>
+	</article>
+</div>
+{{end}}
+{{define "script"}}
+{{end}}

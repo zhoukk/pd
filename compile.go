@@ -114,6 +114,9 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateAlbum(); err != nil {
 		log.Fatalln(err.Error())
 	}
+	if err := CreateVideo(); err != nil {
+		log.Fatalln(err.Error())
+	}
 	if err := CopyJsCssImg(); err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -322,6 +325,21 @@ func CreateAlbum() error {
 		return err
 	}
 	err = ioutil.WriteFile(filepath.Join(OutputPath, "album.html"), buf.Bytes(), os.ModePerm)
+	return err
+}
+
+func CreateVideo() error {
+	var buf bytes.Buffer
+	t, err := Tpl.Clone()
+	if err != nil {
+		return err
+	}
+	t = template.Must(t.ParseFiles(Theme + "/video.html"))
+	err = t.Execute(&buf, Mapper{"config": Config})
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(filepath.Join(OutputPath, "video.html"), buf.Bytes(), os.ModePerm)
 	return err
 }
 
