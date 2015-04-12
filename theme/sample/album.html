@@ -1,0 +1,23 @@
+{{define "title"}}
+<title>相册</title>
+<script type="text/javascript">
+	function show_photo(photo)
+	{
+		document.getElementById("preview").src = "image/"+photo
+	}
+</script>
+{{end}}
+{{define "body"}}
+<table>
+	<tr>
+		<td>
+			<img id="preview" src=""/>
+		</td>
+		<td>
+			{{range .config.photos}}
+			<a href="javascript:void(0)" onclick="show_photo({{.}})" onmouseover="show_photo({{.}})" title="{{.}}"><img src="image/thumb/{{.}}" alt="{{.}}" /></a>
+			{{end}}
+		</td>
+	</tr>
+</table>
+{{end}}

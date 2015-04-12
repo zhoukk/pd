@@ -1,0 +1,21 @@
+{{define "title"}}
+<title>存档</title>
+{{end}}
+{{define "body"}}
+<p>
+	{{range $i,$v := .tags}}
+	<ul>
+		<li>
+			{{$i}}
+			<ul>
+				{{range $v}}
+				<li>
+					<a href="{{.permalink}}">{{.title}}</a>
+				</li>
+				{{end}}
+			</ul>
+		</li>
+	</ul>
+	{{end}}
+</p>
+{{end}}

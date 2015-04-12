@@ -1,0 +1,13 @@
+{{define "title"}}
+<title>{{.config.title}}</title>
+{{end}}
+{{define "body"}}
+<p>周凯凯的主页</p>
+<ul>
+	{{range .posts}}
+	<li>
+		<a href="{{.permalink}}">{{.title}}<time>{{.sdate}}</time></a>
+	</li>
+	{{end}}
+</ul>
+{{end}}

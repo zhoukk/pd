@@ -1,0 +1,15 @@
+{{define "title"}}
+<title>{{.post.title}}</title>
+{{end}}
+{{define "body"}}
+{{if .title}}
+<title>{{.title}}</title>
+{{end}}
+<p>
+	<h1>{{.post.title}}</h1>
+	<small>{{.post.sdate}} - {{.post.tags}}</small>
+</p>
+<p>
+	{{.post.content}}
+</p>
+{{end}}

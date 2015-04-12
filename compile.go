@@ -20,10 +20,10 @@ var compileCmd = &Command{
 	UsageLine: "compile config.json",
 	Short:     "compile whole website",
 	Long: `
-compile all markdown file in post.
+	compile all markdown file in post.
 
-compile markdown file to html file.
-`,
+	compile markdown file to html file.
+	`,
 }
 
 var (
@@ -159,7 +159,9 @@ func LoadTheme() error {
 		tplfiles = append(tplfiles, path)
 		return nil
 	})
-	Tpl = template.Must(template.ParseFiles(tplfiles...))
+	if len(tplfiles) > 0 {
+		Tpl = template.Must(template.ParseFiles(tplfiles...))
+	}
 	return err
 }
 
@@ -243,8 +245,13 @@ func WritePostToFile(post Mapper) error {
 	if err != nil {
 		return err
 	}
-	t, err := Tpl.Clone()
-	t = template.Must(t.ParseFiles(Theme + "/post.html"))
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/post.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/post.html"))
+	}
 	err = t.Execute(&buf, Mapper{"post": post, "config": Config})
 	if err != nil {
 		return err
@@ -255,12 +262,14 @@ func WritePostToFile(post Mapper) error {
 
 func CreateIndex() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/index.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/index.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/index.html"))
-	err = t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
+	err := t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -270,12 +279,14 @@ func CreateIndex() error {
 
 func CreateArchive() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/archive.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/archive.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/archive.html"))
-	err = t.Execute(&buf, Mapper{"tags": Tags, "config": Config})
+	err := t.Execute(&buf, Mapper{"tags": Tags, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -285,12 +296,14 @@ func CreateArchive() error {
 
 func CreateAbout() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/about.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/about.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/about.html"))
-	err = t.Execute(&buf, Mapper{"config": Config})
+	err := t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
@@ -300,12 +313,14 @@ func CreateAbout() error {
 
 func CreateMsgBoard() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/msgboard.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/msgboard.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/msgboard.html"))
-	err = t.Execute(&buf, Mapper{"config": Config})
+	err := t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
@@ -315,12 +330,14 @@ func CreateMsgBoard() error {
 
 func CreateAlbum() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/album.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/album.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/album.html"))
-	err = t.Execute(&buf, Mapper{"config": Config})
+	err := t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
@@ -330,12 +347,14 @@ func CreateAlbum() error {
 
 func CreateVideo() error {
 	var buf bytes.Buffer
-	t, err := Tpl.Clone()
-	if err != nil {
-		return err
+	var t *template.Template
+	if Tpl != nil {
+		t, _ = Tpl.Clone()
+		t = template.Must(t.ParseFiles(Theme + "/video.html"))
+	} else {
+		t = template.Must(template.ParseFiles(Theme + "/video.html"))
 	}
-	t = template.Must(t.ParseFiles(Theme + "/video.html"))
-	err = t.Execute(&buf, Mapper{"config": Config})
+	err := t.Execute(&buf, Mapper{"config": Config})
 	if err != nil {
 		return err
 	}
