@@ -1,23 +1,46 @@
 {{define "title"}}
 <title>相册</title>
 <script type="text/javascript">
-	function show_photo(photo)
-	{
-		document.getElementById("preview").src = "image/"+photo
+	function show_photo(photo) {
+		var preview = document.getElementById("preview")
+		var img = document.getElementById(photo)
+		var preview_img = document.getElementById("preview_img")
+		var descript = document.getElementById("descript")
+		var l,t,r,b
+		preview.style.display = "block"
+		preview_img.src = "image/"+"test.jpg"
+		l = event.clientX-preview_img.width/2
+		t = event.clientY-preview_img.height/2
+		if (l < 0) {
+			l = 0
+		}
+		if (t < 0) {
+			t = 0
+		}
+		if (l > document.body.clientWidth-preview_img.width) {
+			l = document.body.clientWidth-preview_img.width
+		}
+		if (t > document.body.clientHeight-preview_img.height) {
+			t = document.body.clientHeight-preview_img.height
+		}
+		preview.style.left = l
+		preview.style.top = t
+		descript.innerHTML = photo
+	}
+	function close_show() {
+		var preview = document.getElementById("preview")
+		preview.style.display = "none"
 	}
 </script>
 {{end}}
 {{define "body"}}
-<table>
-	<tr>
-		<td>
-			<img id="preview" src=""/>
-		</td>
-		<td>
-			{{range .config.photos}}
-			<a href="javascript:void(0)" onclick="show_photo({{.}})" onmouseover="show_photo({{.}})" title="{{.}}"><img src="image/thumb/{{.}}" alt="{{.}}" /></a>
-			{{end}}
-		</td>
-	</tr>
-</table>
+<div id="preview" onclick="close_show()" style="position:absolute;display:none;">
+	<img id="preview_img"/>
+	<p id="descript"></p>
+</div>
+<div>
+	{{range .config.photos}}
+	<img id="{{.}}" src="image/thumb/test.jpg" alt="{{.}}" onclick="show_photo({{.}})"/>
+	{{end}}
+</div>
 {{end}}

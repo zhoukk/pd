@@ -117,9 +117,7 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateVideo(); err != nil {
 		log.Fatalln(err.Error())
 	}
-	if err := CopyJsCssImg(); err != nil {
-		log.Fatalln(err.Error())
-	}
+	CopyJsCssImg()
 	if err := CreateRss(); err != nil {
 		log.Fatalln(err.Error())
 	}
