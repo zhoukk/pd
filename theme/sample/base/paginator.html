@@ -1,0 +1,12 @@
+<div>
+	{{if .post.previous_url}}
+	<a href="{{.post.previous_url}}" title="{{.post.previous_title}}">&larr; 上一篇</a>
+	{{else}}
+	<a>&larr; 上一篇</a>
+	{{end}}
+	{{if .post.next_url}}
+	<a href="{{.post.next_url}}" title="{{.post.next_title}}">下一篇 &rarr;</a>
+	{{else}}
+	<a>下一篇 &rarr;</a>
+	{{end}}
+</div>

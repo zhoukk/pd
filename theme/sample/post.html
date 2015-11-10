@@ -2,14 +2,14 @@
 <title>{{.post.title}}</title>
 {{end}}
 {{define "body"}}
-{{if .title}}
-<title>{{.title}}</title>
-{{end}}
-<p>
-	<h1>{{.post.title}}</h1>
-	<small>{{.post.sdate}} - {{.post.tags}}</small>
-</p>
-<p>
-	{{.post.content}}
-</p>
+<article style="margin:0 100px;">
+	<p>
+		<h1>{{.post.title}}</h1>
+		<small>{{.post.sdate}} - {{.post.tags}}</small>
+	</p>
+	<p>
+		{{.post.content}}
+		{{template "paginator.html" .}}
+	</p>
+</article>
 {{end}}

@@ -8,6 +8,14 @@
 	"output": "../zhoukk.github.io/",
 	"port": ":80",
 	"root": "../zhoukk.github.io",
+	"htmls": [
+		"blog.html",
+		"archive.html",
+		"about.html",
+		"msgboard.html",
+		"album.html",
+		"video.html"
+	],
 	"photos": [
 		"2015-4-12-10-32-0.png",
 		"2015-4-18-21-17-0.png",

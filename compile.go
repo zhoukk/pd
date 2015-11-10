@@ -99,23 +99,11 @@ func compileApp(cmd *Command, args []string) {
 			continue
 		}
 	}
-	if err := CreateIndex(); err != nil {
-		log.Fatalln(err.Error())
-	}
-	if err := CreateArchive(); err != nil {
-		log.Fatalln(err.Error())
-	}
-	if err := CreateAbout(); err != nil {
-		log.Fatalln(err.Error())
-	}
-	if err := CreateMsgBoard(); err != nil {
-		log.Fatalln(err.Error())
-	}
-	if err := CreateAlbum(); err != nil {
-		log.Fatalln(err.Error())
-	}
-	if err := CreateVideo(); err != nil {
-		log.Fatalln(err.Error())
+	htmls := Config["htmls"].([]interface{})
+	for _, v := range htmls {
+		if err := CreateHtml(v.(string)); err != nil {
+			log.Fatalln(err.Error())
+		}
 	}
 	CopyJsCssImg()
 	if err := CreateRss(); err != nil {
@@ -258,105 +246,20 @@ func WritePostToFile(post Mapper) error {
 	return err
 }
 
-func CreateIndex() error {
+func CreateHtml(html string) error {
 	var buf bytes.Buffer
 	var t *template.Template
 	if Tpl != nil {
 		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/index.html"))
+		t = template.Must(t.ParseFiles(Theme + html))
 	} else {
-		t = template.Must(template.ParseFiles(Theme + "/index.html"))
+		t = template.Must(template.ParseFiles(Theme + html))
 	}
-	err := t.Execute(&buf, Mapper{"posts": Posts, "config": Config})
+	err := t.Execute(&buf, Mapper{"tags": Tags, "posts": Posts, "config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "index.html"), buf.Bytes(), os.ModePerm)
-	return err
-}
-
-func CreateArchive() error {
-	var buf bytes.Buffer
-	var t *template.Template
-	if Tpl != nil {
-		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/archive.html"))
-	} else {
-		t = template.Must(template.ParseFiles(Theme + "/archive.html"))
-	}
-	err := t.Execute(&buf, Mapper{"tags": Tags, "config": Config})
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "archive.html"), buf.Bytes(), os.ModePerm)
-	return err
-}
-
-func CreateAbout() error {
-	var buf bytes.Buffer
-	var t *template.Template
-	if Tpl != nil {
-		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/about.html"))
-	} else {
-		t = template.Must(template.ParseFiles(Theme + "/about.html"))
-	}
-	err := t.Execute(&buf, Mapper{"config": Config})
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "about.html"), buf.Bytes(), os.ModePerm)
-	return err
-}
-
-func CreateMsgBoard() error {
-	var buf bytes.Buffer
-	var t *template.Template
-	if Tpl != nil {
-		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/msgboard.html"))
-	} else {
-		t = template.Must(template.ParseFiles(Theme + "/msgboard.html"))
-	}
-	err := t.Execute(&buf, Mapper{"config": Config})
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "msgboard.html"), buf.Bytes(), os.ModePerm)
-	return err
-}
-
-func CreateAlbum() error {
-	var buf bytes.Buffer
-	var t *template.Template
-	if Tpl != nil {
-		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/album.html"))
-	} else {
-		t = template.Must(template.ParseFiles(Theme + "/album.html"))
-	}
-	err := t.Execute(&buf, Mapper{"config": Config})
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "album.html"), buf.Bytes(), os.ModePerm)
-	return err
-}
-
-func CreateVideo() error {
-	var buf bytes.Buffer
-	var t *template.Template
-	if Tpl != nil {
-		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/video.html"))
-	} else {
-		t = template.Must(template.ParseFiles(Theme + "/video.html"))
-	}
-	err := t.Execute(&buf, Mapper{"config": Config})
-	if err != nil {
-		return err
-	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "video.html"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(OutputPath, html), buf.Bytes(), os.ModePerm)
 	return err
 }
 

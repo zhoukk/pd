@@ -1,0 +1,18 @@
+{{define "title"}}
+<title>{{.config.title}}</title>
+{{end}}
+{{define "body"}}
+{{range .posts}}
+<article style="background-color:#fafafa;margin-bottom:20px;">
+	<header style="border-bottom:1px solid #dbdbdb;">
+		<h1>
+			<a style="padding-left:30px;padding-top:30px;color:#2ca6cb;text-decoration:none" href="{{.permalink}}" title="{{.title}}">{{.title}}</a>
+		</h1>
+		<time style="float:right;" datetime="{{.sdate}}"> 发表于 {{.sdate}}</time>
+	</header>
+	<div style="padding:30px;">
+		{{.content}}	
+	</div>
+</article>
+{{end}}
+{{end}}
