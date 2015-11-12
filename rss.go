@@ -49,6 +49,6 @@ func CreateRss() error {
 		return err
 	}
 	buf.Write(data)
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "rss.xml"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(Root, "rss.xml"), buf.Bytes(), os.ModePerm)
 	return err
 }

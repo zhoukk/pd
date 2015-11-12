@@ -37,6 +37,6 @@ func CreateSitemap() error {
 		return err
 	}
 	buf.Write(data)
-	err = ioutil.WriteFile(filepath.Join(OutputPath, "sitemap.xml"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(Root, "sitemap.xml"), buf.Bytes(), os.ModePerm)
 	return err
 }

@@ -26,7 +26,7 @@
 
 <!-- body -->
 {{define "body"}}
-{{template "body.html" .}}
+{{template "layout_8_4.html" .}}
 {{end}}
 
 <!-- content -->
@@ -37,7 +37,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h3>
-				<a href="{{$v.permalink}}" title="{{$v.title}}">{{$v.title}}</a>
+				<strong><a href="{{$v.permalink}}" title="{{$v.title}}">{{$v.title}}</a></strong>
 			</h3>
 		</div>
 		<div class="panel-body">
@@ -47,15 +47,15 @@
 			<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
 			<time datetime="{{$v.sdate}}">{{$v.sdate}}</time>
 			<a data-toggle="collapse" href="#comments_{{$i}}" aria-expanded="false" aria-controls="comments_{{$i}}">留言</a>
-			<span class="badge">{{$i}}</span>
+			<span class="badge">0</span>
 		</div>
 		<div class="panel-collapse collapse" id="comments_{{$i}}">
 			<div class="panel-body">
 				<!-- comment list -->
 				<ul class="list-group">
 					<li class="list-group-item">
-						<h4 class="list-group-item-heading"><a href="">zhoukk</a></h4>
-						<p class="list-group-item-text">what a f**k xxoo.</p>
+						<h4 class="list-group-item-heading"><a href=""></a></h4>
+						<p class="list-group-item-text"></p>
 					</li>
 				</ul>
 

@@ -21,39 +21,47 @@
 
 <!-- script -->
 {{define "script"}}
-
+<script type="text/javascript">
+	$('#photo-view').on('show.bs.modal', function (event) {
+	var a = $(event.relatedTarget)
+	var src = a.data('whatever')
+	var modal = $(this)
+	modal.find('.modal-content img').attr("src", src)
+})
+</script>
 {{end}}
 
 <!-- body -->
 {{define "body"}}
-{{template "body_media.html" .}}
+{{template "layout_12.html" .}}
 {{end}}
 
 <!-- content -->
 {{define "content"}}
 
-<!-- <video src="https://raw.githubusercontent.com/zhoukk/zhoukk.github.io/master/video/2015-3-6-21-27-0" preload="auto" controls="controls"></video>
+<!--  <video src="https://raw.githubusercontent.com/zhoukk/zhoukk.github.io/master/video/2015-3-6-21-27-0" preload="auto" controls="controls"></video>
 <video src="https://raw.githubusercontent.com/zhoukk/zhoukk.github.io/master/video/2015-3-18-21-42-0" preload="auto" controls="controls"></video>
--->
+ -->
+
+
+<div class="modal fade" id="photo-view" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<img src="" alt="">
+		</div>
+	</div>
+</div>
 
 <div class="row">
-	<div class="col-xs-6 col-md-3">
+	{{range .photos}}
+	<div class="col-sm-2 col-md-1">
 		<div class="thumbnail">
-			<img src="1.png" alt="...">
-			<div class="caption">
-				<h3>Thumbnail label</h3>
-			</div>
+			<a href="#photo-view" data-toggle="modal" data-whatever="/image/{{.}}">
+				<img src="/image/thumb/{{.}}" alt="{{.}}">
+			</a>
 		</div>
 	</div>
-	<div class="col-xs-6 col-md-3">
-		<div class="thumbnail">
-			<img src="1.png" alt="...">
-			<div class="caption">
-				<h3>Thumbnail label</h3>
-			</div>
-		</div>
-	</div>
-
+	{{end}}
 </div>
 
 {{end}}

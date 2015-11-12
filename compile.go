@@ -28,12 +28,13 @@ var compileCmd = &Command{
 
 var (
 	Theme      string
-	InputPath  string
-	OutputPath string
+	Root       string
 	Config     Mapper
 	Tpl        *template.Template
 	Posts      AllPost
 	Categories map[string]AllPost
+	Videos     []string
+	Photos     []string
 )
 
 type AllPost []Mapper
@@ -78,6 +79,16 @@ func compileApp(cmd *Command, args []string) {
 		return
 	}
 	err = LoadTheme()
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+	err = LoadPhotos()
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+	err = LoadVideos()
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -128,8 +139,7 @@ func LoadConf(config_file string) error {
 		return err
 	}
 	Theme = Config["theme"].(string)
-	InputPath = Config["input"].(string)
-	OutputPath = Config["output"].(string)
+	Root = Config["root"].(string)
 	return nil
 }
 
@@ -151,8 +161,36 @@ func LoadTheme() error {
 	return err
 }
 
+func LoadPhotos() error {
+	err := filepath.Walk(Root+"/image/thumb/", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
+			return nil
+		}
+		Photos = append(Photos, filepath.Base(path))
+		return nil
+	})
+	return err
+}
+
+func LoadVideos() error {
+	err := filepath.Walk(Root+"/video/", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
+			return nil
+		}
+		Videos = append(Videos, filepath.Base(path))
+		return nil
+	})
+	return err
+}
+
 func LoadPosts() error {
-	err := filepath.Walk(InputPath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(Root+"/post/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -226,7 +264,7 @@ func CreatePost(post Mapper, i int) (Mapper, error) {
 
 func WritePostToFile(post Mapper) error {
 	var buf bytes.Buffer
-	link := filepath.Join(OutputPath, post["permalink"].(string))
+	link := filepath.Join(Root, post["permalink"].(string))
 	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
 	if err != nil {
 		return err
@@ -255,19 +293,19 @@ func CreateHtml(html string) error {
 	} else {
 		t = template.Must(template.ParseFiles(Theme + html))
 	}
-	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "config": Config})
+	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "photos": Photos, "videos": Videos, "config": Config})
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(OutputPath, html), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(filepath.Join(Root, html), buf.Bytes(), os.ModePerm)
 	return err
 }
 
 func CopyJsCssImg() {
-	CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "/static/js"))
-	CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "/static/css"))
-	CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "/static/img"))
-	CopyDir(filepath.Join(Theme, "fonts"), filepath.Join(OutputPath, "/static/fonts"))
+	CopyDir(filepath.Join(Theme, "js"), filepath.Join(Root, "/static/js"))
+	CopyDir(filepath.Join(Theme, "css"), filepath.Join(Root, "/static/css"))
+	CopyDir(filepath.Join(Theme, "img"), filepath.Join(Root, "/static/img"))
+	CopyDir(filepath.Join(Theme, "fonts"), filepath.Join(Root, "/static/fonts"))
 }
 
 func CopyDir(srcpath, dstpath string) error {
