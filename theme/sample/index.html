@@ -1,132 +1,101 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta http-equiv="Content-Type"content="text/html;charset=utf-8">
-	<meta http-equiv="Content-Language" content="zh-CN">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="renderer" content="webkit">
-	<meta name="keywords" content="blog,zhoukk,zhoukk.com">
-	<meta name="description" content="zhoukk's blog">
-	<meta name="author" content="zhoukk,zhoukk@zhoukk.com">
 
-	<title>zhoukk's blog</title>
+<!-- meta -->
+{{define "meta"}}
+<meta name="keywords" content="blog,zhoukk,zhoukk.com">
+<meta name="description" content="zhoukk's blog">
+<meta name="author" content="zhoukk,zhoukk@zhoukk.com">
+{{end}}
 
-	<link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="style.css" rel="stylesheet">
+<!-- title -->
+{{define "title"}}
+<title>zhoukk's blog</title>
+{{end}}
 
-	<!--[if lt IE 9]>
-	<script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	<script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-	<![endif]-->
-</head>
-<body>
-	<div class="container">
-		<nav class="navbar" role="navigation">
-			<ul class="nav navbar-nav list-inline">
-				<li>
-					<a href="/">主页</a>
-				</li>
-				<li>
-					<a href="/archive">存档</a>
-				</li>
-				<li>
-					<a href="/about">关于</a>
-				</li>
-			</ul>
-		</nav>
 
-		<div class="row" role="main">
-			<div class="col-sm-6 col-sm-offset-1">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">
-							<a href="">如何编写一个最精简HTTP服务器</a>
-						</h3>
-					</div>
-					<div class="panel-body">
-						<h4>定义</h4>
-						<p>什么是HTTP服务器? 它有提供什么服务?</p>
-						<p>最基本的HTTP服务器在80断口监听,接受浏览器发出的请求,然后返回处理的请求</p>
-						<p>
-							xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-						</p>
-					</div>
-					<div class="panel-footer text-right">
-						<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-						<time datetime="2015-12-03">2015-12-03</time>
-						<a href="">
-							Comments
-							<span class="badge">3</span>
-						</a>
-					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Panel title</h3>
-					</div>
-					<div class="panel-body">Panel content</div>
-					<div class="panel-footer">Panel footer</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Panel title</h3>
-					</div>
-					<div class="panel-body">Panel content</div>
-					<div class="panel-footer">Panel footer</div>
-				</div>
-			</div>
-			<div class="col-sm-3 col-sm-offset-1">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Archive</h3>
-					</div>
-					<div class="panel-body">
-						<ul>
-							<li>a</li>
-							<li>b</li>
-							<li>c</li>
-							<li>d</li>
-						</ul>
-					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Tags</h3>
-					</div>
-					<div class="panel-body">
-						<ul>
-							<li>a</li>
-							<li>b</li>
-							<li>c</li>
-							<li>d</li>
-						</ul>
-					</div>
-				</div>
-			</div>
+<!-- style -->
+{{define "style"}}
+
+{{end}}
+
+
+<!-- script -->
+{{define "script"}}
+
+{{end}}
+
+<!-- body -->
+{{define "body"}}
+{{template "body.html" .}}
+{{end}}
+
+<!-- content -->
+{{define "content"}}
+<div class="panel-group" role="tablist" aria-multiselectable="true">
+	{{range $i,$v := .posts}}
+	<!-- article list -->
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3>
+				<a href="{{$v.permalink}}" title="{{$v.title}}">{{$v.title}}</a>
+			</h3>
 		</div>
+		<div class="panel-body">
+			{{$v.content}}
+		</div>
+		<div class="panel-footer text-right">
+			<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+			<time datetime="{{$v.sdate}}">{{$v.sdate}}</time>
+			<a data-toggle="collapse" href="#comments_{{$i}}" aria-expanded="false" aria-controls="comments_{{$i}}">留言</a>
+			<span class="badge">{{$i}}</span>
+		</div>
+		<div class="panel-collapse collapse" id="comments_{{$i}}">
+			<div class="panel-body">
+				<!-- comment list -->
+				<ul class="list-group">
+					<li class="list-group-item">
+						<h4 class="list-group-item-heading"><a href="">zhoukk</a></h4>
+						<p class="list-group-item-text">what a f**k xxoo.</p>
+					</li>
+				</ul>
 
-		<footer class="footer">
-			<div class="container">
-				<p>zhoukk.com</p>
+				<!-- comment form -->
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="nickname" class="col-sm-2 control-label">昵称</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="nickname">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="url" class="col-sm-2 control-label">链接</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="url">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content" class="col-sm-2 control-label">内容</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" id="content" rows="6"></textarea>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-default">留言</button>
+						</div>
+					</div>
+				</form>
 			</div>
-		</footer>
+
+		</div>
 	</div>
-	<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-</body>
-</html>
+	<!-- more article -->
+	{{end}}
+</div>
+{{end}}
+
+<!-- aside -->
+{{define "aside"}}
+{{template "side.html" .}}
+{{end}}
+

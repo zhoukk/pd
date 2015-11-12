@@ -1,0 +1,11 @@
+<!-- category list -->
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse_archive" aria-expanded="true" aria-controls="collapse_archive">类目</a></h3>
+	</div>
+	<div class="list-group collapse in" id="collapse_archive">
+		{{range $i,$v := .categories}}
+		<a href="/archive.html#category_{{$i}}" class="list-group-item"><span class="badge">{{$v|len}}</span>{{$i}}</a>
+		{{end}}
+	</div>
+</div>

@@ -1,7 +1,36 @@
+
+<!-- meta -->
+{{define "meta"}}
+<meta name="keywords" content="blog,zhoukk,zhoukk.com">
+<meta name="description" content="zhoukk's blog">
+<meta name="author" content="zhoukk,zhoukk@zhoukk.com">
+{{end}}
+
+
+<!-- title -->
 {{define "title"}}
 <title>关于</title>
 {{end}}
+
+
+<!-- style -->
+{{define "style"}}
+
+{{end}}
+
+
+<!-- script -->
+{{define "script"}}
+
+{{end}}
+
+<!-- body -->
 {{define "body"}}
+{{template "body_media.html" .}}
+{{end}}
+
+<!-- content -->
+{{define "content"}}
 <pre>
 	走在乡间的小路上
 	暮归的老牛是我同伴
@@ -18,4 +47,10 @@
 	都随晚风飘散
 	遗忘在乡间的小路上
 </pre>
+{{end}}
+
+
+<!-- aside -->
+{{define "aside"}}
+
 {{end}}

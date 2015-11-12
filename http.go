@@ -59,7 +59,7 @@ func httpApp(cmd *Command, args []string) {
 				return
 			}
 			t = template.Must(t.ParseFiles(Theme + "/archive.html"))
-			err = t.ExecuteTemplate(w, "body", Mapper{"title": "存档", "tags": Tags, "config": Config})
+			err = t.ExecuteTemplate(w, "body", Mapper{"title": "存档", "categories": Categories, "config": Config})
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}

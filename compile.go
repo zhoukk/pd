@@ -33,7 +33,7 @@ var (
 	Config     Mapper
 	Tpl        *template.Template
 	Posts      AllPost
-	Tags       map[string]AllPost
+	Categories map[string]AllPost
 )
 
 type AllPost []Mapper
@@ -64,7 +64,7 @@ func init() {
 	compileCmd.Run = compileApp
 	AddCommand(compileCmd)
 	log.SetFlags(log.Lshortfile)
-	Tags = make(map[string]AllPost, 0)
+	Categories = make(map[string]AllPost, 0)
 }
 
 func compileApp(cmd *Command, args []string) {
@@ -164,11 +164,11 @@ func LoadPosts() error {
 			return err
 		}
 		post["path"] = path
-		tag := post["tags"].(string)
-		if Tags[tag] == nil {
-			Tags[tag] = make(AllPost, 0)
+		category := post["category"].(string)
+		if Categories[category] == nil {
+			Categories[category] = make(AllPost, 0)
 		}
-		Tags[tag] = append(Tags[tag], post)
+		Categories[category] = append(Categories[category], post)
 		Posts = append(Posts, post)
 		return nil
 	})
@@ -238,7 +238,7 @@ func WritePostToFile(post Mapper) error {
 	} else {
 		t = template.Must(template.ParseFiles(Theme + "/post.html"))
 	}
-	err = t.Execute(&buf, Mapper{"post": post, "config": Config})
+	err = t.Execute(&buf, Mapper{"categories": Categories, "post": post, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -255,7 +255,7 @@ func CreateHtml(html string) error {
 	} else {
 		t = template.Must(template.ParseFiles(Theme + html))
 	}
-	err := t.Execute(&buf, Mapper{"tags": Tags, "posts": Posts, "config": Config})
+	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "config": Config})
 	if err != nil {
 		return err
 	}
@@ -263,17 +263,11 @@ func CreateHtml(html string) error {
 	return err
 }
 
-func CopyJsCssImg() error {
-	if err := CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "/static/js")); err != nil {
-		return err
-	}
-	if err := CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "/static/css")); err != nil {
-		return err
-	}
-	if err := CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "/static/img")); err != nil {
-		return err
-	}
-	return nil
+func CopyJsCssImg() {
+	CopyDir(filepath.Join(Theme, "js"), filepath.Join(OutputPath, "/static/js"))
+	CopyDir(filepath.Join(Theme, "css"), filepath.Join(OutputPath, "/static/css"))
+	CopyDir(filepath.Join(Theme, "img"), filepath.Join(OutputPath, "/static/img"))
+	CopyDir(filepath.Join(Theme, "fonts"), filepath.Join(OutputPath, "/static/fonts"))
 }
 
 func CopyDir(srcpath, dstpath string) error {

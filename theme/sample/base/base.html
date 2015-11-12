@@ -1,12 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta http-equiv="Content-Type"content="text/html;charset=utf-8">
+	<meta http-equiv="Content-Language" content="zh-CN">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="renderer" content="webkit">
+
+	{{template "meta" .}}
+
 	{{template "title" .}}
+
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+	<link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+
+	{{template "style" .}}
+
+	<!--[if lt IE 9]>
+	<script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
 </head>
 <body>
-	{{template "navbar.html" .}}
-	{{template "body" .}}
-	{{template "side.html" .}}
-	{{template "footer.html" .}}
+	<div class="container">
+
+		<!-- navbar -->
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+				<ul class="nav navbar-nav list-inline">
+					<li>
+						<a href="/">主页</a>
+					</li>
+					<li>
+						<a href="/archive.html">存档</a>
+					</li>
+					<li>
+						<a href="/media.html">相册</a>
+					</li>
+					<li>
+						<a href="/about.html">关于</a>
+					</li>
+				</ul>
+				<form class="navbar-form navbar-right" role="search">
+					<div class="form-group">
+						<input type="text" class="form-control" placeholder="Search">
+					</div>
+					<button type="submit" class="btn btn-default">搜索</button>
+				</form>
+			</div>
+		</nav>
+
+		<div class="row" role="main">
+
+			{{template "body" .}}
+			
+		</div>
+
+		<!-- footer -->
+		<footer class="navbar navbar-default">
+			<div class="container-fluid">
+				<p class="navbar-text text-center">zhoukk.com</p>
+			</div>
+		</footer>
+
+	</div>
+
+	<!-- scripts -->
+	<script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+	<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	
+	{{template "script" .}}
+
 </body>
 </html>

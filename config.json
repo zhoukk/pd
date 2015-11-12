@@ -7,10 +7,13 @@
 	"input": "../zhoukk.github.io/post/",
 	"output": "../zhoukk.github.io/",
 	"port": ":80",
-	"root": "../../../../",
+	"root": "../zhoukk.github.io/",
 	"htmls": [
-		"blog.html",
-		"archive.html"
+		"index.html",
+		"post.html",
+		"archive.html",
+		"media.html",
+		"about.html"
 	],
 	"photos": [
 		"2015-4-12-10-32-0.png",
