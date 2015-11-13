@@ -70,11 +70,7 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
-	config_file := "config.json"
-	if len(args) > 0 {
-		config_file = args[0]
-	}
-	err := LoadConf(config_file)
+	err := LoadConf("config.json")
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -84,16 +80,8 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 		return
 	}
-	err = LoadPhotos()
-	if err != nil {
-		log.Fatalln(err.Error())
-		return
-	}
-	err = LoadVideos()
-	if err != nil {
-		log.Fatalln(err.Error())
-		return
-	}
+	LoadPhotos()
+	LoadVideos()
 	err = LoadPosts()
 	if err != nil {
 		log.Fatalln(err.Error())

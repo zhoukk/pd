@@ -64,6 +64,7 @@ config.json
 6. 生成每篇文章的html文件
 7. 生成网站其他html文件
 8. 拷贝主题目录下资源文件夹/js /css /img /fonts到/root/static目录
+9. 生成rss.xml atom.xml sitemap.xml
 
 本地预览
 ===
