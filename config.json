@@ -1,17 +1,9 @@
 {
 	"domain": "http://zhoukk.com",
-	"author": "zhoukk",
+	"author": "zhoukk,zhoukk@zhoukk.com",
 	"theme": "./theme/sample/",
 	"title": "zhoukk",
 	"description": "zhoukk's page",
 	"port": ":80",
-	"root": "../zhoukk.github.io/",
-	"htmls": [
-		"blog.html",
-		"post.html",
-		"archive.html",
-		"media.html",
-		"video.html",
-		"about.html"
-	]
+	"root": "../zhoukk.github.io/"
 }

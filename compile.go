@@ -35,6 +35,7 @@ var (
 	Categories map[string]AllPost
 	Videos     []string
 	Photos     []string
+	Htmls      []string
 )
 
 type AllPost []Mapper
@@ -110,9 +111,8 @@ func compileApp(cmd *Command, args []string) {
 			continue
 		}
 	}
-	htmls := Config["htmls"].([]interface{})
-	for _, v := range htmls {
-		if err := CreateHtml(v.(string)); err != nil {
+	for _, v := range Htmls {
+		if err := CreateHtml(v); err != nil {
 			log.Fatalln(err.Error())
 		}
 	}
@@ -149,7 +149,8 @@ func LoadTheme() error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") || !strings.HasSuffix(path, ".html") {
+		filename := filepath.Base(path)
+		if info.IsDir() || strings.HasPrefix(filename, ".") || !strings.HasSuffix(filename, ".html") {
 			return nil
 		}
 		tplfiles = append(tplfiles, path)
@@ -158,43 +159,57 @@ func LoadTheme() error {
 	if len(tplfiles) > 0 {
 		Tpl = template.Must(template.ParseFiles(tplfiles...))
 	}
+	dir, err := ioutil.ReadDir(Theme + "/")
+	if err != nil {
+		return err
+	}
+	for _, f := range dir {
+		filename := f.Name()
+		if f.IsDir() || strings.HasPrefix(filename, ".") || !strings.HasSuffix(filename, ".html") {
+			continue
+		}
+		Htmls = append(Htmls, filename)
+	}
 	return err
 }
 
 func LoadPhotos() error {
-	err := filepath.Walk(Root+"/image/thumb/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(Root+"/photos/thumb/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
+		filename := filepath.Base(path)
+		if info.IsDir() || strings.HasPrefix(filename, ".") {
 			return nil
 		}
-		Photos = append(Photos, filepath.Base(path))
+		Photos = append(Photos, filename)
 		return nil
 	})
 	return err
 }
 
 func LoadVideos() error {
-	err := filepath.Walk(Root+"/video/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(Root+"/videos/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
+		filename := filepath.Base(path)
+		if info.IsDir() || strings.HasPrefix(filename, ".") {
 			return nil
 		}
-		Videos = append(Videos, filepath.Base(path))
+		Videos = append(Videos, filename)
 		return nil
 	})
 	return err
 }
 
 func LoadPosts() error {
-	err := filepath.Walk(Root+"/post/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(Root+"/posts/", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() || strings.HasPrefix(filepath.Base(path), ".") {
+		filename := filepath.Base(path)
+		if info.IsDir() || strings.HasPrefix(filename, ".") || !strings.HasSuffix(filename, ".md") {
 			return nil
 		}
 		post, err := LoadPost(path)

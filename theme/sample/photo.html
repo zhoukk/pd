@@ -3,7 +3,6 @@
 {{define "meta"}}
 <meta name="keywords" content="blog,zhoukk,zhoukk.com">
 <meta name="description" content="zhoukk's blog">
-<meta name="author" content="zhoukk,zhoukk@zhoukk.com">
 {{end}}
 
 
@@ -39,10 +38,6 @@
 <!-- content -->
 {{define "content"}}
 
-<!--  <video src="https://raw.githubusercontent.com/zhoukk/zhoukk.github.io/master/video/2015-3-6-21-27-0" preload="auto" controls="controls"></video>
-<video src="https://raw.githubusercontent.com/zhoukk/zhoukk.github.io/master/video/2015-3-18-21-42-0" preload="auto" controls="controls"></video>
- -->
-
 
 <div class="modal fade" id="photo-view" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
@@ -56,8 +51,8 @@
 	{{range .photos}}
 	<div class="col-sm-2 col-md-1">
 		<div class="thumbnail">
-			<a href="#photo-view" data-toggle="modal" data-whatever="/image/{{.}}">
-				<img src="/image/thumb/{{.}}" alt="{{.}}">
+			<a href="#photo-view" data-toggle="modal" data-whatever="/photos/{{.}}">
+				<img src="/photos/thumb/{{.}}" alt="{{.}}">
 			</a>
 		</div>
 	</div>
