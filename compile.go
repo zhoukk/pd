@@ -70,11 +70,7 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
-	config_file := "config.json"
-	if len(args) > 0 {
-		config_file = args[0]
-	}
-	err := LoadConf(config_file)
+	err := LoadConf("config.json")
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -84,16 +80,8 @@ func compileApp(cmd *Command, args []string) {
 		log.Fatalln(err.Error())
 		return
 	}
-	err = LoadPhotos()
-	if err != nil {
-		log.Fatalln(err.Error())
-		return
-	}
-	err = LoadVideos()
-	if err != nil {
-		log.Fatalln(err.Error())
-		return
-	}
+	LoadPhotos()
+	LoadVideos()
 	err = LoadPosts()
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -145,7 +133,7 @@ func LoadConf(config_file string) error {
 
 func LoadTheme() error {
 	var tplfiles []string
-	err := filepath.Walk(Theme+"/base/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(Theme, "/base/"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -159,7 +147,7 @@ func LoadTheme() error {
 	if len(tplfiles) > 0 {
 		Tpl = template.Must(template.ParseFiles(tplfiles...))
 	}
-	dir, err := ioutil.ReadDir(Theme + "/")
+	dir, err := ioutil.ReadDir(filepath.Join(Theme, "/"))
 	if err != nil {
 		return err
 	}
@@ -174,7 +162,7 @@ func LoadTheme() error {
 }
 
 func LoadPhotos() error {
-	err := filepath.Walk(Root+"/photos/thumb/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(Root, "/photos/thumb/"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -189,7 +177,7 @@ func LoadPhotos() error {
 }
 
 func LoadVideos() error {
-	err := filepath.Walk(Root+"/videos/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(Root, "/videos/"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -204,7 +192,7 @@ func LoadVideos() error {
 }
 
 func LoadPosts() error {
-	err := filepath.Walk(Root+"/posts/", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(Root, "/posts/"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -285,11 +273,12 @@ func WritePostToFile(post Mapper) error {
 		return err
 	}
 	var t *template.Template
+	filename := filepath.Join(Theme, "/post.html")
 	if Tpl != nil {
 		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + "/post.html"))
+		t = template.Must(t.ParseFiles(filename))
 	} else {
-		t = template.Must(template.ParseFiles(Theme + "/post.html"))
+		t = template.Must(template.ParseFiles(filename))
 	}
 	err = t.Execute(&buf, Mapper{"categories": Categories, "post": post, "config": Config})
 	if err != nil {
@@ -302,11 +291,12 @@ func WritePostToFile(post Mapper) error {
 func CreateHtml(html string) error {
 	var buf bytes.Buffer
 	var t *template.Template
+	filename := filepath.Join(Theme, html)
 	if Tpl != nil {
 		t, _ = Tpl.Clone()
-		t = template.Must(t.ParseFiles(Theme + html))
+		t = template.Must(t.ParseFiles(filename))
 	} else {
-		t = template.Must(template.ParseFiles(Theme + html))
+		t = template.Must(template.ParseFiles(filename))
 	}
 	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "photos": Photos, "videos": Videos, "config": Config})
 	if err != nil {

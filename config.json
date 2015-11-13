@@ -2,7 +2,7 @@
 	"domain": "http://zhoukk.com",
 	"author": "zhoukk,zhoukk@zhoukk.com",
 	"theme": "./theme/sample/",
-	"title": "zhoukk",
+	"title": "zhoukk's blog",
 	"description": "zhoukk's page",
 	"port": ":80",
 	"root": "../zhoukk.github.io/"

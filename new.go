@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -31,9 +32,13 @@ func newApp(cmd *Command, args []string) {
 		fmt.Fprintln(os.Stderr, "[ERRO] Argument [postname] is missing")
 		os.Exit(2)
 	}
-
-	filename := "post/" + args[0] + ".md"
-	_, err := os.Stat(filename)
+	err := LoadConf("config.json")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+	filename := filepath.Join(Root, "/posts", args[0]+".md")
+	_, err = os.Stat(filename)
 	if err == nil || !os.IsNotExist(err) {
 		fmt.Fprintf(os.Stderr, "post file %s already exist? \n", filename)
 		return
@@ -51,7 +56,7 @@ func newApp(cmd *Command, args []string) {
 	mdata["date"] = t.Format("2006-01-02 15:04:05")
 	mdata["permalink"] = fmt.Sprintf("/%d/%d/%s.html", y, m, title)
 	mdata["description"] = ""
-	mdata["tags"] = "默认"
+	mdata["category"] = "默认"
 	b, err := json.MarshalIndent(mdata, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
