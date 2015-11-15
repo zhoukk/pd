@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 )
 
 var httpCmd = &Command{
@@ -16,7 +18,18 @@ var httpCmd = &Command{
 	`,
 }
 
+type Comment struct {
+	Id       string `json:"id"`
+	Nickname string `json:"nickname"`
+	Url      string `json:"url"`
+	Content  string `json:"content"`
+	Time     string `json:"time"`
+}
+
+var comments map[string][]Comment
+
 func init() {
+	comments = make(map[string][]Comment, 0)
 	httpCmd.Run = httpApp
 	AddCommand(httpCmd)
 }
@@ -83,21 +96,24 @@ func httpApp(cmd *Command, args []string) {
 		}
 		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
 	})
-	http.HandleFunc("/msgboard.html", func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-PJAX") == "true" {
-			t, err := Tpl.Clone()
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			t = template.Must(t.ParseFiles(Theme + "/msgboard.html"))
-			err = t.ExecuteTemplate(w, "body", Mapper{"title": "留言板", "config": Config})
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-			return
+	http.HandleFunc("/list_comment.ajax", func(w http.ResponseWriter, r *http.Request) {
+		var data []Comment
+		id := r.FormValue("id")
+		data = comments[id]
+		w.Header().Add("Content-Type", "application/json;charset=utf-8")
+		if err := json.NewEncoder(w).Encode(data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
-		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
+	})
+	http.HandleFunc("/new_comment.ajax", func(w http.ResponseWriter, r *http.Request) {
+		var data Comment
+		data.Id = r.FormValue("id")
+		data.Nickname = r.FormValue("nickname")
+		data.Url = r.FormValue("url")
+		data.Content = r.FormValue("content")
+		data.Time = time.Now().String()
+		comments[data.Id] = append(comments[data.Id], data)
+		http.Redirect(w, r, data.Id, http.StatusOK)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-PJAX") == "true" {
