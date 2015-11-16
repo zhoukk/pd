@@ -96,7 +96,7 @@ func httpApp(cmd *Command, args []string) {
 		}
 		http.FileServer(http.Dir(root)).ServeHTTP(w, r)
 	})
-	http.HandleFunc("/list_comment.ajax", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/comment.list", func(w http.ResponseWriter, r *http.Request) {
 		var data []Comment
 		id := r.FormValue("id")
 		data = comments[id]
@@ -106,7 +106,7 @@ func httpApp(cmd *Command, args []string) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
-	http.HandleFunc("/new_comment.ajax", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/comment.new", func(w http.ResponseWriter, r *http.Request) {
 		var data Comment
 		data.Id = r.FormValue("id")
 		data.Nickname = r.FormValue("nickname")

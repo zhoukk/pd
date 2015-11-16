@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -37,6 +36,6 @@ func CreateSitemap() error {
 		return err
 	}
 	buf.Write(data)
-	err = ioutil.WriteFile(filepath.Join(Root, "sitemap.xml"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile("sitemap.xml", buf.Bytes(), os.ModePerm)
 	return err
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -49,6 +48,6 @@ func CreateRss() error {
 		return err
 	}
 	buf.Write(data)
-	err = ioutil.WriteFile(filepath.Join(Root, "rss.xml"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile("rss.xml", buf.Bytes(), os.ModePerm)
 	return err
 }

@@ -29,7 +29,6 @@ var compileCmd = &Command{
 
 var (
 	Theme      string
-	Root       string
 	Config     Mapper
 	Tpl        *template.Template
 	Posts      AllPost
@@ -100,16 +99,15 @@ func compileApp(cmd *Command, args []string) {
 			continue
 		}
 	}
-	index := Config["index"].(string)
 	for _, v := range Htmls {
-		if strings.HasPrefix(v, index) {
+		if v == "index.html" || v == "post.html" {
 			continue
 		}
 		if err := CreateHtml(v); err != nil {
 			log.Fatalln(err.Error())
 		}
 	}
-	if err := CreateIndex(index); err != nil {
+	if err := CreateIndex(); err != nil {
 		log.Fatalln(err.Error())
 	}
 	CopyJsCssImg()
@@ -135,13 +133,12 @@ func LoadConf(config_file string) error {
 		return err
 	}
 	Theme = Config["theme"].(string)
-	Root = Config["root"].(string)
 	return nil
 }
 
 func LoadTheme() error {
 	var tplfiles []string
-	err := filepath.Walk(filepath.Join(Theme, "/base/"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(Theme, "base"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -155,7 +152,7 @@ func LoadTheme() error {
 	if len(tplfiles) > 0 {
 		Tpl = template.Must(template.ParseFiles(tplfiles...))
 	}
-	dir, err := ioutil.ReadDir(filepath.Join(Theme, "/"))
+	dir, err := ioutil.ReadDir(Theme)
 	if err != nil {
 		return err
 	}
@@ -170,7 +167,7 @@ func LoadTheme() error {
 }
 
 func LoadPhotos() error {
-	err := filepath.Walk(filepath.Join(Root, "/photos/thumb/"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("photos/thumb", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -185,7 +182,7 @@ func LoadPhotos() error {
 }
 
 func LoadVideos() error {
-	err := filepath.Walk(filepath.Join(Root, "/videos/"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("videos", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -200,7 +197,7 @@ func LoadVideos() error {
 }
 
 func LoadPosts() error {
-	err := filepath.Walk(filepath.Join(Root, "/posts/"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk("posts", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -307,13 +304,13 @@ func CreatePost(post Mapper, i int) (Mapper, error) {
 
 func WritePostToFile(post Mapper) error {
 	var buf bytes.Buffer
-	link := filepath.Join(Root, post["permalink"].(string))
+	link := post["permalink"].(string)
 	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
 	if err != nil {
 		return err
 	}
 	var t *template.Template
-	filename := filepath.Join(Theme, "/post.html")
+	filename := filepath.Join(Theme, "post.html")
 	if Tpl != nil {
 		t, _ = Tpl.Clone()
 		t = template.Must(t.ParseFiles(filename))
@@ -342,15 +339,11 @@ func CreateHtml(html string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filepath.Join(Root, html), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile(html, buf.Bytes(), os.ModePerm)
 	return err
 }
 
-func Template_Add(a int, b int) int {
-	return a + b
-}
-
-func CreateIndex(index string) error {
+func CreateIndex() error {
 	num_per_page := int(Config["blog_per_page"].(float64))
 	num_paginat := int(Config["pagination_show_num"].(float64))
 	half_num_paginat := num_paginat / 2
@@ -362,36 +355,65 @@ func CreateIndex(index string) error {
 	for i := 1; i <= total_page; i++ {
 		var buf bytes.Buffer
 		var t *template.Template
-		filename := filepath.Join(Theme, index+".html")
+		filename := filepath.Join(Theme, "index.html")
 		if Tpl != nil {
 			t, _ = Tpl.Clone()
-			t = template.Must(t.Funcs(template.FuncMap{"add": Template_Add}).ParseFiles(filename))
+			t = template.Must(t.ParseFiles(filename))
 		} else {
-			t = template.Must(template.New(index).Funcs(template.FuncMap{"add": Template_Add}).ParseFiles(filename))
+			t = template.Must(template.ParseFiles(filename))
 		}
-		var pages []int
+		var pages []Mapper
 		var s int
 		if i <= half_num_paginat {
 			s = 1
 		} else {
 			s = i - half_num_paginat
 		}
-		if i >= total_page-half_num_paginat {
+		if i >= total_page-half_num_paginat && total_page > num_paginat {
 			s = total_page - num_paginat + 1
 		}
-		for p := 0; p < num_paginat; p++ {
-			pages = append(pages, p+s)
+		q := num_paginat
+		if q > total_page {
+			q = total_page
+		}
+		for p := 0; p < q; p++ {
+			m := make(Mapper)
+			m["p"] = p + s
+			if p+s == 1 {
+				m["url"] = "index.html"
+			} else {
+				m["url"] = fmt.Sprintf("index_%d.html", p+s)
+			}
+			pages = append(pages, m)
 		}
 		n := (i - 1) * num_per_page
 		m := i * num_per_page
 		if m > num {
 			m = num
 		}
-		err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts[n:m], "pages": pages, "page": i, "total_page": total_page, "config": Config})
+		var outname string
+		var prevurl, nexturl string
+		if i == 1 {
+			outname = "/index.html"
+			prevurl = ""
+			nexturl = "/index_2.html"
+		} else {
+			outname = fmt.Sprintf("index_%d.html", i)
+			if i == 2 {
+				prevurl = "/index.html"
+				nexturl = "/index_3.html"
+			} else {
+				prevurl = fmt.Sprintf("/index_%d.html", i-1)
+				nexturl = fmt.Sprintf("/index_%d.html", i)
+			}
+		}
+		err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts[n:m],
+			"pages": pages, "prevurl": prevurl, "nexturl": nexturl,
+			"page": i, "total_page": total_page, "config": Config})
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Join(Root, fmt.Sprintf("%s_%d.html", index, i)), buf.Bytes(), os.ModePerm)
+		err = ioutil.WriteFile(outname, buf.Bytes(), os.ModePerm)
 		if err != nil {
 			return err
 		}
@@ -400,10 +422,10 @@ func CreateIndex(index string) error {
 }
 
 func CopyJsCssImg() {
-	CopyDir(filepath.Join(Theme, "js"), filepath.Join(Root, "/static/js"))
-	CopyDir(filepath.Join(Theme, "css"), filepath.Join(Root, "/static/css"))
-	CopyDir(filepath.Join(Theme, "img"), filepath.Join(Root, "/static/img"))
-	CopyDir(filepath.Join(Theme, "fonts"), filepath.Join(Root, "/static/fonts"))
+	CopyDir(filepath.Join(Theme, "js"), "static/js")
+	CopyDir(filepath.Join(Theme, "css"), "static/css")
+	CopyDir(filepath.Join(Theme, "img"), "static/img")
+	CopyDir(filepath.Join(Theme, "fonts"), "static/fonts")
 }
 
 func CopyDir(srcpath, dstpath string) error {

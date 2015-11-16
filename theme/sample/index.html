@@ -1,8 +1,7 @@
 
 <!-- meta -->
 {{define "meta"}}
-<meta name="keywords" content="blog,zhoukk,zhoukk.com">
-<meta name="description" content="zhoukk's blog">
+
 {{end}}
 
 
@@ -62,20 +61,20 @@
 		{{if eq .page 1}}
 		<li class="disabled"><a aria-label="上一页"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></li>
 		{{else}}
-		<li><a href="/blog_{{add .page -1}}.html" aria-label="上一页"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></li>
+		<li><a href="{{.prevurl}}" aria-label="上一页"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span></a></li>
 		{{end}}
 		{{$p := .page}}
 		{{range $i := .pages}}
-		{{if eq $i $p}}
-		<li class="active"><a href="/blog_{{$i}}.html">{{$i}} <span class="sr-only">(current)</span></a></li>
+		{{if eq $i.p $p}}
+		<li class="active"><a href="{{$i.url}}">{{$i.p}} <span class="sr-only">(current)</span></a></li>
 		{{else}}
-		<li><a href="/blog_{{$i}}.html">{{$i}}</a></li>
+		<li><a href="{{$i.url}}">{{$i.p}}</a></li>
 		{{end}}
 		{{end}}
 		{{if eq .page .total_page}}
 		<li class="disabled"><a aria-label="下一页"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a></li>
 		{{else}}
-		<li><a href="/blog_{{add .page 1}}.html" aria-label="下一页"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a></li>
+		<li><a href="{{.nexturl}}" aria-label="下一页"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></a></li>
 		{{end}}
 	</ul>
 </nav>

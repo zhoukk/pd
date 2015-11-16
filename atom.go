@@ -6,7 +6,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"time"
 )
 
@@ -96,6 +95,6 @@ func CreateAtom() error {
 		return err
 	}
 	buf.Write(data)
-	err = ioutil.WriteFile(filepath.Join(Root, "atom.xml"), buf.Bytes(), os.ModePerm)
+	err = ioutil.WriteFile("atom.xml", buf.Bytes(), os.ModePerm)
 	return err
 }

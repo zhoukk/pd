@@ -1,8 +1,7 @@
 
 <!-- meta -->
 {{define "meta"}}
-<meta name="keywords" content="blog,zhoukk,zhoukk.com">
-<meta name="description" content="zhoukk's blog">
+
 {{end}}
 
 
@@ -23,7 +22,7 @@
 
 <script>
 	function list_comment() {
-		$.get("http://git.zhoukk.com/list_comment.ajax", {id:window.location.pathname}, function(data, status) {
+		$.get("{{.config.ajax}}/comment.list", {id:window.location.pathname}, function(data, status) {
 			if (data != null) {
 				$("#comment_list").html("")
 				$.each(data, function(i, comment) {
@@ -66,7 +65,7 @@
 				return 'http://' + match;
 			}
 		});
-		$.post("http://git.zhoukk.com/new_comment.ajax", {
+		$.post("{{.config.ajax}}/comment.new", {
 			id:window.location.pathname,
 			nickname:nickname,
 			url:url,
