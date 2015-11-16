@@ -101,6 +101,7 @@ func httpApp(cmd *Command, args []string) {
 		id := r.FormValue("id")
 		data = comments[id]
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		if err := json.NewEncoder(w).Encode(data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -111,9 +112,13 @@ func httpApp(cmd *Command, args []string) {
 		data.Nickname = r.FormValue("nickname")
 		data.Url = r.FormValue("url")
 		data.Content = r.FormValue("content")
-		data.Time = time.Now().String()
+		if len(data.Nickname) == 0 || len(data.Content) == 0 {
+			return
+		}
+		data.Time = time.Now().Format("2006-01-02 15:04:05")
+		data.Content = MarkdownToHtml(data.Content)
 		comments[data.Id] = append(comments[data.Id], data)
-		http.Redirect(w, r, data.Id, http.StatusOK)
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("X-PJAX") == "true" {

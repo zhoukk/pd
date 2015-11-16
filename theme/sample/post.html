@@ -23,15 +23,21 @@
 
 <script>
 	function list_comment() {
-		$.get("/list_comment.ajax", {id:window.location.pathname}, function(data, status) {
+		$.get("http://git.zhoukk.com/list_comment.ajax", {id:window.location.pathname}, function(data, status) {
 			if (data != null) {
 				$("#comment_list").html("")
 				$.each(data, function(i, comment) {
-					var list = '<li class="list-group-item"><h4 class="list-group-item-heading"><a href="'+
-					comment.url+'">'+comment.nickname+'</a></h4><p class="list-group-item-text">'+comment.content+'</p></li>'
+					var list = '<li class="list-group-item"><h4 class="list-group-item-heading">'
+					if (comment.url != "") {
+						list = list + '<a href="' + comment.url + '" target="_blank">' + comment.nickname + '</a>'
+					} else {
+						list = list + comment.nickname
+					}
+					list = list + '<p class="pull-right"><small><span class="glyphicon glyphicon-time" aria-hidden="true"></span>  ' + comment.time + '</small></p>'
+					list = list + '</h4><p class="list-group-item-text">' + comment.content + '</p></li>'
 					$("#comment_list").append(list)
 				})
-				$("#cnt_comment").text(data.length)
+				$("#cnt_comment").text(" " + data.length)
 			}
 		})
 	}
@@ -39,12 +45,35 @@
 		list_comment()
 	})
 	$('#btn_comment').on('click', function () {
-		$.post("/new_comment.ajax", {
+		var nickname = $("#nickname").val()
+		if (nickname == "" || nickname == null) {
+			$("#comment_alert").html("输入一个昵称")
+			$("#comment_alert").show()
+			return
+		}
+		var content = $("#content").val()
+		if (content == "" || content == null) {
+			$("#comment_alert").html("输入一些文字")
+			$("#comment_alert").show()
+			return
+		}
+		var url = $("#url").val()
+		var regex = /(https?:\/\/)?(\w+\.?)+(\/[a-zA-Z0-9\?%=_\-\+\/]+)?/gi;
+		url = url.replace(regex, function (match, capture) {
+			if (capture) {
+				return match
+			} else {
+				return 'http://' + match;
+			}
+		});
+		$.post("http://git.zhoukk.com/new_comment.ajax", {
 			id:window.location.pathname,
-			nickname:$("#nickname").val(),
-			url:$("#url").val(),
-			content:$("#content").val()
+			nickname:nickname,
+			url:url,
+			content:content
 		}, function(data, status) {
+			$("#content").val("")
+			$("#comment_alert").hide()
 			list_comment()
 		})
 	})
@@ -68,14 +97,16 @@
 	<div class="panel-body">
 		{{.post.content}}
 	</div>
-	<div class="panel-footer text-right">
+	<div class="panel-footer">
+		<span class="glyphicon glyphicon-tag" aria-hidden="true"></span>
 		<span class="label label-default">{{.post.category}}</span>
-		<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
-		<time datetime="{{.post.sdate}}">{{.post.sdate}}</time>
-		<a data-toggle="collapse" href="#comments" aria-expanded="false" aria-controls="comments">留言</a>
-		<span class="badge" id="cnt_comment">0</span>
+		<p class="pull-right">
+			<span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+			<time datetime="{{.post.sdate}}">{{.post.date}}</time>
+			<a class="btn btn-primary btn-xs" data-toggle="collapse" href="#comments" aria-expanded="false" aria-controls="comments"><span class="glyphicon glyphicon-comment" aria-hidden="true" id="cnt_comment"> 0</span></a>
+		</p>
 	</div>
-	<div class="panel-collapse collapse in" id="comments">
+	<div class="panel-collapse collapse in" name="comments" id="comments">
 		<div class="panel-body">
 			<!-- comment list -->
 			<ul id="comment_list" class="list-group">
@@ -84,10 +115,12 @@
 
 			<!-- comment form -->
 			<form class="form-horizontal">
+				<div class="alert alert-danger" id="comment_alert" role="alert" hidden="true">
+				</div>
 				<div class="form-group">
 					<label for="nickname" class="col-sm-2 control-label">昵称</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="nickname">
+						<input type="text" class="form-control" id="nickname" required="required">
 					</div>
 				</div>
 				<div class="form-group">
@@ -99,7 +132,7 @@
 				<div class="form-group">
 					<label for="content" class="col-sm-2 control-label">内容</label>
 					<div class="col-sm-10">
-						<textarea class="form-control" id="content" rows="6"></textarea>
+						<textarea class="form-control" id="content" rows="6" required="required"></textarea>
 					</div>
 				</div>
 				<div class="form-group">
@@ -116,20 +149,20 @@
 <ul class="pager">
 	{{if .post.previous_url}}
 	<li class="previous">
-		<a href="{{.post.previous_url}}" title="{{.post.previous_title}}">&larr; 上一篇</a>
+		<a href="{{.post.previous_url}}" title="{{.post.previous_title}}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> 上一篇</a>
 	</li>
 	{{else}}
 	<li class="previous disabled">
-		<a>&larr; 上一篇</a>
+		<a><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> 上一篇</a>
 	</li>
 	{{end}}
 	{{if .post.next_url}}
 	<li class="next">
-		<a href="{{.post.next_url}}" title="{{.post.next_title}}">下一篇 &rarr;</a>
+		<a href="{{.post.next_url}}" title="{{.post.next_title}}">下一篇 <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
 	</li>
 	{{else}}
 	<li class="next disabled">
-		<a>下一篇 &rarr;</a>
+		<a>下一篇 <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span></a>
 	</li>
 	{{end}}
 </ul>

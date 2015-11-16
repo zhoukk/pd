@@ -5,5 +5,8 @@
 	"title": "zhoukk's blog",
 	"description": "zhoukk's page",
 	"port": ":80",
+	"index": "blog",
+	"blog_per_page": 2,
+	"pagination_show_num": 7,
 	"root": "../zhoukk.github.io/"
 }

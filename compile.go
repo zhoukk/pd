@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -99,10 +100,17 @@ func compileApp(cmd *Command, args []string) {
 			continue
 		}
 	}
+	index := Config["index"].(string)
 	for _, v := range Htmls {
+		if strings.HasPrefix(v, index) {
+			continue
+		}
 		if err := CreateHtml(v); err != nil {
 			log.Fatalln(err.Error())
 		}
+	}
+	if err := CreateIndex(index); err != nil {
+		log.Fatalln(err.Error())
 	}
 	CopyJsCssImg()
 	if err := CreateRss(); err != nil {
@@ -231,8 +239,43 @@ func LoadPost(path string) (post Mapper, err error) {
 	if err != nil {
 		return
 	}
-	post["content"] = string(content[n+1:])
+	str := string(content[n+1:])
+	post["content"] = str
+	post["summary"] = MakeSummary(str)
 	return
+}
+
+func MakeSummary(str string) string {
+	r := bufio.NewReader(strings.NewReader(str))
+	summary := ""
+	readUntil := ""
+	lines := 20
+	for lines > 0 {
+		line, _ := r.ReadString('\n')
+		if strings.Contains(line, "![") {
+			continue
+		}
+		summary += line
+		lines--
+		if strings.Trim(line, "\r\n\t ") == "```" {
+			if readUntil == "" {
+				readUntil = "```"
+			} else {
+				readUntil = ""
+			}
+		}
+		if lines == 0 {
+			var err error
+			for readUntil != strings.Trim(line, "\r\n\t ") {
+				line, err = r.ReadString('\n')
+				summary += line
+				if err != nil {
+					break
+				}
+			}
+		}
+	}
+	return summary
 }
 
 func CreatePost(post Mapper, i int) (Mapper, error) {
@@ -249,6 +292,8 @@ func CreatePost(post Mapper, i int) (Mapper, error) {
 	}
 	content := post["content"].(string)
 	post["content"] = template.HTML(MarkdownToHtml(content))
+	summary := post["summary"].(string)
+	post["summary"] = template.HTML(MarkdownToHtml(summary))
 	if prev != nil {
 		post["previous_url"] = (*prev)["permalink"]
 		post["previous_title"] = (*prev)["title"]
@@ -257,11 +302,6 @@ func CreatePost(post Mapper, i int) (Mapper, error) {
 		post["next_url"] = (*next)["permalink"]
 		post["next_title"] = (*next)["title"]
 	}
-	ti, err := time.Parse("2006-01-02 15:04:05", post["date"].(string))
-	if err != nil {
-		return post, err
-	}
-	post["sdate"] = ti.Format("2006-01-02")
 	return post, nil
 }
 
@@ -304,6 +344,59 @@ func CreateHtml(html string) error {
 	}
 	err = ioutil.WriteFile(filepath.Join(Root, html), buf.Bytes(), os.ModePerm)
 	return err
+}
+
+func Template_Add(a int, b int) int {
+	return a + b
+}
+
+func CreateIndex(index string) error {
+	num_per_page := int(Config["blog_per_page"].(float64))
+	num_paginat := int(Config["pagination_show_num"].(float64))
+	half_num_paginat := num_paginat / 2
+	num := len(Posts)
+	total_page := num / num_per_page
+	if num%num_per_page != 0 {
+		total_page++
+	}
+	for i := 1; i <= total_page; i++ {
+		var buf bytes.Buffer
+		var t *template.Template
+		filename := filepath.Join(Theme, index+".html")
+		if Tpl != nil {
+			t, _ = Tpl.Clone()
+			t = template.Must(t.Funcs(template.FuncMap{"add": Template_Add}).ParseFiles(filename))
+		} else {
+			t = template.Must(template.New(index).Funcs(template.FuncMap{"add": Template_Add}).ParseFiles(filename))
+		}
+		var pages []int
+		var s int
+		if i <= half_num_paginat {
+			s = 1
+		} else {
+			s = i - half_num_paginat
+		}
+		if i >= total_page-half_num_paginat {
+			s = total_page - num_paginat + 1
+		}
+		for p := 0; p < num_paginat; p++ {
+			pages = append(pages, p+s)
+		}
+		n := (i - 1) * num_per_page
+		m := i * num_per_page
+		if m > num {
+			m = num
+		}
+		err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts[n:m], "pages": pages, "page": i, "total_page": total_page, "config": Config})
+		if err != nil {
+			return err
+		}
+		err = ioutil.WriteFile(filepath.Join(Root, fmt.Sprintf("%s_%d.html", index, i)), buf.Bytes(), os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func CopyJsCssImg() {
