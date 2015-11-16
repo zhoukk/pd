@@ -394,7 +394,7 @@ func CreateIndex() error {
 		var outname string
 		var prevurl, nexturl string
 		if i == 1 {
-			outname = "/index.html"
+			outname = "index.html"
 			prevurl = ""
 			nexturl = "/index_2.html"
 		} else {
