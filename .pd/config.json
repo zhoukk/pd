@@ -1,0 +1,12 @@
+{
+	"ajax": "http://ajax.domain.com",
+	"author": "author",
+	"blog_per_page": 10,
+	"description": "description",
+	"domain": "http://domain.com",
+	"keywords": "keywords",
+	"pagination_show_num": 7,
+	"summary_line": 20,
+	"theme": "sample",
+	"title": "title"
+}

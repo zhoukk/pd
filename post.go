@@ -10,7 +10,7 @@ import (
 )
 
 var postCmd = &Command{
-	UsageLine: "post [postname]",
+	UsageLine: "post [filename] [title]",
 	Short:     "create a new post",
 	Long: `
 create a markdown format post.
@@ -26,12 +26,8 @@ func init() {
 	AddCommand(postCmd)
 }
 
-func postApp(cmd *Command, args []string) {
-	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "[ERRO] Argument [postname] is missing")
-		os.Exit(2)
-	}
-	filename := filepath.Join("posts", args[0]+".md")
+func create_post(name, title string) {
+	filename := filepath.Join(".pd", "posts", name+".md")
 	_, err := os.Stat(filename)
 	if err == nil || !os.IsNotExist(err) {
 		fmt.Fprintf(os.Stderr, "post file %s already exist? \n", filename)
@@ -42,7 +38,6 @@ func postApp(cmd *Command, args []string) {
 		fmt.Fprintf(os.Stderr, "mkdir %s error:%s\n", filename, err.Error())
 		return
 	}
-	title := args[0]
 	t := time.Now()
 	y, m, _ := t.Date()
 	mdata := Mapper{}
@@ -61,5 +56,18 @@ func postApp(cmd *Command, args []string) {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return
 	}
-	fmt.Printf("new post at :%s\n", filename)
+	fmt.Printf("create post %s\n", filename)
+}
+
+func postApp(cmd *Command, args []string) {
+	if len(args) == 0 {
+		fmt.Fprintln(os.Stderr, "[ERRO] Argument [filename] is missing")
+		os.Exit(2)
+	}
+	name := args[0]
+	title := name
+	if len(args) > 1 {
+		title = args[1]
+	}
+	create_post(name, title)
 }

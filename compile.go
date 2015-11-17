@@ -21,7 +21,7 @@ var compileCmd = &Command{
 	UsageLine: "compile config.json",
 	Short:     "compile whole website",
 	Long: `
-	compile all markdown file in post.
+	compile all markdown file in .pd/posts.
 
 	compile markdown file to html file.
 	`,
@@ -67,35 +67,36 @@ func init() {
 	AddCommand(compileCmd)
 	log.SetFlags(log.Lshortfile)
 	Categories = make(map[string]AllPost, 0)
+	Config = make(Mapper)
 }
 
 func compileApp(cmd *Command, args []string) {
-	err := LoadConf("config.json")
+	err := LoadConf(".pd/config.json")
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 		return
 	}
 	err = LoadTheme()
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 		return
 	}
 	LoadPhotos()
 	LoadVideos()
 	err = LoadPosts()
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 		return
 	}
 	for i, v := range Posts {
 		p, err := CreatePost(v, i)
 		if err != nil {
-			log.Fatalln(err.Error())
+			log.Fatal(err)
 			continue
 		}
 		Posts[i] = p
 		if err := WritePostToFile(p); err != nil {
-			log.Fatalln(err.Error())
+			log.Fatal(err)
 			continue
 		}
 	}
@@ -104,21 +105,21 @@ func compileApp(cmd *Command, args []string) {
 			continue
 		}
 		if err := CreateHtml(v); err != nil {
-			log.Fatalln(err.Error())
+			log.Fatal(err)
 		}
 	}
 	if err := CreateIndex(); err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 	}
 	CopyJsCssImg()
 	if err := CreateRss(); err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 	}
 	if err := CreateAtom(); err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 	}
 	if err := CreateSitemap(); err != nil {
-		log.Fatalln(err.Error())
+		log.Fatal(err)
 	}
 }
 
@@ -132,7 +133,7 @@ func LoadConf(config_file string) error {
 	if err != nil {
 		return err
 	}
-	Theme = Config["theme"].(string)
+	Theme = filepath.Join(".pd/theme", Config["theme"].(string))
 	return nil
 }
 
@@ -197,7 +198,7 @@ func LoadVideos() error {
 }
 
 func LoadPosts() error {
-	err := filepath.Walk("posts", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(".pd/posts", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -246,7 +247,7 @@ func MakeSummary(str string) string {
 	r := bufio.NewReader(strings.NewReader(str))
 	summary := ""
 	readUntil := ""
-	lines := 20
+	lines := int(Config["summary_line"].(float64))
 	for lines > 0 {
 		line, _ := r.ReadString('\n')
 		if strings.Contains(line, "![") {
@@ -304,7 +305,7 @@ func CreatePost(post Mapper, i int) (Mapper, error) {
 
 func WritePostToFile(post Mapper) error {
 	var buf bytes.Buffer
-	link := post["permalink"].(string)
+	link := filepath.Join(".", post["permalink"].(string))
 	err := os.MkdirAll(filepath.Dir(link), os.ModePerm)
 	if err != nil {
 		return err
@@ -446,12 +447,12 @@ func CopyDir(srcpath, dstpath string) error {
 		if obj.IsDir() {
 			err = CopyDir(srcfile, dstfile)
 			if err != nil {
-				log.Fatalln(err.Error())
+				log.Fatal(err)
 			}
 		} else {
 			err = CopyFile(srcfile, dstfile)
 			if err != nil {
-				log.Fatalln(err.Error())
+				log.Fatal(err)
 			}
 		}
 	}

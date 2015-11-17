@@ -1,11 +1,16 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,6 +71,56 @@ func AddCommand(cmd *Command) {
 	commands = append(commands, cmd)
 }
 
+func zip_pd() {
+	var b bytes.Buffer
+	myzip := zip.NewWriter(&b)
+	err := filepath.Walk(".pd", func(path string, info os.FileInfo, err error) error {
+		var file []byte
+		if err != nil {
+			return filepath.SkipDir
+		}
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return filepath.SkipDir
+		}
+		header.Name, _ = filepath.Rel(filepath.Dir(".pd"), path)
+		if !info.IsDir() {
+			header.Method = 8
+			file, err = ioutil.ReadFile(path)
+			if err != nil {
+				return filepath.SkipDir
+			}
+		} else {
+			file = nil
+		}
+		w, err := myzip.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+		if file != nil {
+			_, err = w.Write(file)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return
+	}
+	myzip.Close()
+	var bb bytes.Buffer
+	encoder := base64.NewEncoder(base64.StdEncoding, &bb)
+	encoder.Write(b.Bytes())
+	encoder.Close()
+	content := fmt.Sprintf("package main\nvar ZipInitStr string = \"%s\"", bb.String())
+	err = ioutil.WriteFile("zip.go", []byte(content), os.ModePerm)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+	}
+}
+
 func tmpl(w io.Writer, text string, data interface{}) {
 	t := template.New("top")
 	t.Funcs(template.FuncMap{"trim": strings.TrimSpace})
@@ -113,6 +168,10 @@ func main() {
 	}
 	if args[0] == "help" {
 		help(args[1:])
+		return
+	}
+	if args[0] == "zip" {
+		zip_pd()
 		return
 	}
 
