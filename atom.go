@@ -64,9 +64,9 @@ func CreateAtom() error {
 		if err != nil {
 			t = time.Now()
 		}
-		body := string(v["content"].(template.HTML))
+		body := template.HTMLEscapeString(string(v["content"].(template.HTML)))
 		e := &Entry{
-			Title: v["title"].(string),
+			Title: template.HTMLEscapeString(v["title"].(string)),
 			ID:    domain + permalink,
 			Link: []Link{{
 				Rel:  "alternate",
@@ -76,7 +76,7 @@ func CreateAtom() error {
 			Updated:   t.Format(time.RFC822),
 			Summary: &Text{
 				Type: "html",
-				Body: v["description"].(string),
+				Body: template.HTMLEscapeString(v["description"].(string)),
 			},
 			Content: &Text{
 				Type: "html",
