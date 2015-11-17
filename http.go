@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -24,10 +26,34 @@ type Comment struct {
 	Time     string `json:"time"`
 }
 
-var comments map[string][]Comment
+type AllComment []Comment
+
+func (p AllComment) Len() int {
+	return len(p)
+}
+
+func (p AllComment) Less(i, j int) bool {
+	p1 := p[i].Time
+	p2 := p[j].Time
+	pt1, err := time.Parse("2006-01-02 15:04:05", p1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pt2, err := time.Parse("2006-01-02 15:04:05", p2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return pt1.After(pt2)
+}
+
+func (p AllComment) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+var comments map[string]AllComment
 
 func init() {
-	comments = make(map[string][]Comment, 0)
+	comments = make(map[string]AllComment, 0)
 	httpCmd.Run = httpApp
 	AddCommand(httpCmd)
 }
@@ -38,9 +64,10 @@ func httpApp(cmd *Command, args []string) {
 		port = args[0]
 	}
 	http.HandleFunc("/comment.list", func(w http.ResponseWriter, r *http.Request) {
-		var data []Comment
+		var data AllComment
 		id := r.FormValue("id")
 		data = comments[id]
+		sort.Sort(data)
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		if err := json.NewEncoder(w).Encode(data); err != nil {

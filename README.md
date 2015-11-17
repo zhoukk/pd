@@ -1,75 +1,123 @@
-pd - golang实现的静态博客生成工具
-========
-
-安装
+pd - 静态博客生成工具
 ===
 
+安装
+---
+编译需要配置好golang开发环境
+	
 	go get -u github.com/zhoukk/pd
 	go install github.com/zhoukk/pd
 
-配置
-===
-
-config.json
-
-1. domain 		网站域名
-2. author 		网站作者
-3. theme  		网站布局颜色主题
-4. title  		主页title
-5. description 	主页描述
-6. port 		测试端口
-7. root 		网站目录
+或直接下载编译好的运行文件[pd.exe](http://zhoukk.com/pd.exe)
 
 命令
-===
+---
 
-1. pd new
-2. pd compile
-3. pd http
-4. pd help
+### pd new [sitename] 创建站点
 
-新建站点
-===
+在当前目录下生成名为sitename的目录做为博客主目录。在主目录下生成photos/thumb，videos，.pd 目录。其中photos目录用于存放照片生成照片墙页面，videos用于存放视频。.pd为配置目录。
 
-1. 新建站点目录
-2. 配置config.json中的root目录 及其他
-3. 照片目录/photos, 照片缩略图目录/photos/thumb
-4. 视频目录/videos
-5. 文章目录/posts
+### pd post [name] [title] 创建新文章
 
-新建文章
-===
+在.pd/posts 目录下生成[name].md文件，并在文件中生成文章的元数据。
 
-1. pd new 文章名字  会在root/post/目录下生成md文件,头部生成meta元数据
-2. 编辑root/post/文章名字.md 文件
+	{
+		"date": "2006-01-02 15:04:05",
+		"description": "pd生成的第一篇文章",
+		"permalink": "/2006/01/first.html",
+		"category": "默认",
+		"title": "第一篇文章"
+	}
 
-	1. data 		文章生成日期
-	2. description	文章描述
-	3. permalink	文章链接
-	4. category		文章类目
-	5. title 		文章标题
+	。。。以下为文章正文内容
 
-3. 以markdown格式在后面编写文章内容
+编辑[name].md文件，修改以上的元数据。在下面以markdown格式编写文章内容。
 
-编译站点
-===
+### pd compile 编译站点
 
-	pd compile
+遍历.pd/posts 目录下所有markdown格式的文章，依次生成对应html文件，路径格式为/ year/month/name.html。拷贝主题所需资源文件到主目录下static目录中。为站点生成rss.xml，atom.xml，sitemap.xml 文件。
 
-1. 读取配置文件config.json
-2. 加载主题文件
-3. 读取照片目录root/photos所有照片
-4. 读取视频目录root/videos所有视频
-5. 读取文章目录root/posts所有文章
-6. 生成每篇文章的html文件
-7. 生成网站其他html文件
-8. 拷贝主题目录下资源文件夹/js /css /img /fonts到/root/static目录
-9. 生成rss.xml atom.xml sitemap.xml
 
-本地预览
-===
+### pd http [port] 预览站点
 
-	pd http
+启动测试web服务器，默认port为:80。启动浏览器，输入http://127.0.0.1预览。
 
-启动本地http服务，根目录为config.json -> root目录
-http://127.0.0.1 查看
+配置
+---
+
+在站点主目录下的.pd目录内有config.json配置文件。
+
+	{
+		"domain": "http://domain.com",
+		"author": "author",
+		"keywords": "keywords",
+		"description": "description",
+		"title": "title",
+		"ajax": "http://ajax.domain.com",
+		"blog_per_page": 10,
+		"pagination_show_num": 7,
+		"summary_line": 20,
+		"theme": "sample"
+	}
+
+- domain
+站点的域名，用于生成rss.xml，atom.xml，sitemap.xml等
+- author
+站点作者
+- keywords
+站点关键字
+- description
+站点描述
+- title
+站点主页的title
+- blog_per_page
+每页文章数，用于分页
+- pagination_show_num
+分页栏显示页数，用于分页
+- theme
+站点使用的主题
+- ajax
+评论功能使用ajax请求的域名
+
+评论
+---
+关于config.json中的ajax配置，此配置用于支持文章评论功能。评论内容支持markdown语法。配置的域名需提供以下两个接口：
+
+- get ajax.domain.com/comment.list?id=xxx.html
+
+	请求指定文章的评论列表，id为文章的uri部分。
+	例如http://ajax.domain.com/comment.list?id=%2F2006%2F1%2Ffirst.html
+	请求/2006/1/first.html文章的评论列表，返回
+
+		[{
+		"nickname":"user1",
+		"url":"http://xxx.com",
+		"content":"\u003cp\u003euser1@http://xxx.com 发表评论1\u003c/p\u003e\n",
+		"time":"2015-11-17 15:51:53"
+		},
+		{
+		"nickname":"user2",
+		"url":"http://xxx.com",
+		"content":"\u003cp\u003euser1@http://xxx.com 发表评论1\u003c/p\u003e\n",
+		"time":"2015-11-17 15:52:00"
+		},
+		{
+		"nickname":"user1",
+		"url":"http://xxx.com",
+		"content":"\u003cp\u003euser1@http://xxx.com 发表评论2\u003c/p\u003e\n",
+		"time":"2015-11-17 15:52:07"
+		}]
+
+	
+- post ajax.domain.com/comment.new
+
+	对指定文章发表评论，数据为
+	
+		id:文章uri
+		nickname:昵称
+		url: nickname链接
+		content: 内容
+	
+例如：
+
+	id=%2F2006%2F1%2Ffirst.html&nickname=user1&url=http%3A%2F%2Fxxx.com&content=评论内容
