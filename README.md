@@ -8,7 +8,7 @@ pd - 静态博客生成工具
 	go get -u github.com/zhoukk/pd
 	go install github.com/zhoukk/pd
 
-或直接下载编译好的运行文件[pd.exe](http://zhoukk.com/pd.exe)
+或直接下载编译好的运行文件[pd.exe](https://github.com/zhoukk/pd/releases/download/1.0/pd.exe)
 
 命令
 ---
