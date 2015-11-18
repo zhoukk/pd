@@ -97,11 +97,9 @@ func zip_pd() {
 		if err != nil {
 			return err
 		}
-		if file != nil {
-			_, err = w.Write(file)
-			if err != nil {
-				return err
-			}
+		_, err = w.Write(file)
+		if err != nil {
+			return err
 		}
 		return nil
 	})
