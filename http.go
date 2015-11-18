@@ -91,5 +91,5 @@ func httpApp(cmd *Command, args []string) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.FileServer(http.Dir(".")).ServeHTTP(w, r)
 	})
-	http.ListenAndServe(port, nil)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
