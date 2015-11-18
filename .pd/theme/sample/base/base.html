@@ -74,7 +74,13 @@
 		</nav>
 
 		<div class="row" role="main">{{template "body" .}}</div>
-
+		
+		<!-- footer -->
+		<footer>
+			<hr>
+			<p class="text-center"><a href="/atom.xml">RSS订阅</a> | <a href="/sitemap.xml">网站地图</a> | <a href="mailto:{{.config.author}}">联系作者</a> | <a href="#">回到顶部</a></p>
+		</footer>
+		
 	</div>
 
 	<!-- scripts -->
