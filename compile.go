@@ -111,7 +111,7 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateIndex(); err != nil {
 		log.Fatal(err)
 	}
-	CopyJsCssImg()
+	CopyStatic()
 	if err := CreateRss(); err != nil {
 		log.Fatal(err)
 	}
@@ -422,11 +422,8 @@ func CreateIndex() error {
 	return nil
 }
 
-func CopyJsCssImg() {
-	CopyDir(filepath.Join(Theme, "js"), "static/js")
-	CopyDir(filepath.Join(Theme, "css"), "static/css")
-	CopyDir(filepath.Join(Theme, "img"), "static/img")
-	CopyDir(filepath.Join(Theme, "fonts"), "static/fonts")
+func CopyStatic() {
+	CopyDir(filepath.Join(Theme, "static"), "static")
 }
 
 func CopyDir(srcpath, dstpath string) error {
