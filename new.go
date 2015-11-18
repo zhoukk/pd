@@ -71,7 +71,8 @@ func newApp(cmd *Command, args []string) {
 		if zf.FileInfo().IsDir() {
 			continue
 		}
-		dst := filepath.Join(sitedir, zf.Name)
+		l := filepath.Join(filepath.SplitList(zf.Name)...)
+		dst := filepath.Join(sitedir, l)
 		os.MkdirAll(filepath.Dir(dst), os.ModePerm)
 		f, err := os.OpenFile(dst, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
 		if err != nil {
@@ -109,8 +110,9 @@ func updateApp(cmd *Command, args []string) {
 		if !strings.Contains(zf.Name, updatedir) {
 			continue
 		}
-		os.MkdirAll(filepath.Dir(zf.Name), os.ModePerm)
-		f, err := os.OpenFile(zf.Name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+		dst := filepath.Join(filepath.SplitList(zf.Name)...)
+		os.MkdirAll(filepath.Dir(dst), os.ModePerm)
+		f, err := os.OpenFile(dst, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
 		if err != nil {
 			log.Fatal(err)
 		}
