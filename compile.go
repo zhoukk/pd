@@ -33,6 +33,7 @@ var (
 	Tpl        *template.Template
 	Posts      AllPost
 	Categories map[string]AllPost
+	About      template.HTML
 	Videos     []string
 	Photos     []string
 	Htmls      []string
@@ -71,23 +72,29 @@ func init() {
 }
 
 func compileApp(cmd *Command, args []string) {
-	err := LoadConf(".pd/config.json")
+	config_file := filepath.Join(".pd", "config.json")
+	err := LoadConf(config_file)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	fmt.Printf("load config :%s.\n", config_file)
 	err = LoadTheme()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	fmt.Printf("load theme :%s.\n", Theme)
 	LoadPhotos()
+	fmt.Printf("load photos.\n")
 	LoadVideos()
+	fmt.Printf("load videos.\n")
 	err = LoadPosts()
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	fmt.Printf("load posts.\n")
 	for i, v := range Posts {
 		p, err := CreatePost(v, i)
 		if err != nil {
@@ -99,6 +106,12 @@ func compileApp(cmd *Command, args []string) {
 			log.Fatal(err)
 			continue
 		}
+	}
+	content, err := ioutil.ReadFile("about.md")
+	if err == nil {
+		About = template.HTML(MarkdownToHtml(string(content)))
+	} else {
+		About = template.HTML("<h1>Hello</h1>")
 	}
 	for _, v := range Htmls {
 		if v == "index.html" || v == "post.html" {
@@ -115,12 +128,16 @@ func compileApp(cmd *Command, args []string) {
 	if err := CreateRss(); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("create file :rss.xml.\n")
 	if err := CreateAtom(); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("create file :atom.xml.\n")
 	if err := CreateSitemap(); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("create file :sitemap.xml.\n")
+	fmt.Printf("compile site done.\n")
 }
 
 func LoadConf(config_file string) error {
@@ -133,7 +150,7 @@ func LoadConf(config_file string) error {
 	if err != nil {
 		return err
 	}
-	Theme = filepath.Join(".pd/theme", Config["theme"].(string))
+	Theme = filepath.Join(".pd", "theme", Config["theme"].(string))
 	return nil
 }
 
@@ -168,7 +185,7 @@ func LoadTheme() error {
 }
 
 func LoadPhotos() error {
-	err := filepath.Walk("photos/thumb", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join("photos", "thumb"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -198,7 +215,7 @@ func LoadVideos() error {
 }
 
 func LoadPosts() error {
-	err := filepath.Walk(".pd/posts", func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(filepath.Join(".pd", "posts"), func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -323,6 +340,9 @@ func WritePostToFile(post Mapper) error {
 		return err
 	}
 	err = ioutil.WriteFile(link, buf.Bytes(), os.ModePerm)
+	if err == nil {
+		fmt.Printf("create file %s.\n", link)
+	}
 	return err
 }
 
@@ -336,11 +356,15 @@ func CreateHtml(html string) error {
 	} else {
 		t = template.Must(template.ParseFiles(filename))
 	}
-	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "photos": Photos, "videos": Videos, "config": Config})
+	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts,
+		"photos": Photos, "videos": Videos, "config": Config, "about": About})
 	if err != nil {
 		return err
 	}
 	err = ioutil.WriteFile(html, buf.Bytes(), os.ModePerm)
+	if err == nil {
+		fmt.Printf("create file %s.\n", html)
+	}
 	return err
 }
 
@@ -418,6 +442,7 @@ func CreateIndex() error {
 		if err != nil {
 			return err
 		}
+		fmt.Printf("create index :%s.\n", outname)
 	}
 	return nil
 }
@@ -473,6 +498,7 @@ func CopyFile(srcName, dstName string) error {
 		if err != nil {
 			err = os.Chmod(dstName, srcinfo.Mode())
 		}
+		fmt.Printf("copy file :%s.\n", dstName)
 	}
 	return err
 }

@@ -8,14 +8,14 @@ pd - 静态博客生成工具
 	go get -u github.com/zhoukk/pd
 	go install github.com/zhoukk/pd
 
-或直接下载编译好的运行文件[pd.exe](https://github.com/zhoukk/pd/releases/download/1.0/pd.exe)
+或直接下载编译好的运行文件[pd.exe](https://github.com/zhoukk/pd/releases/)
 
 命令
 ---
 
 ### pd new [sitename] 创建站点
 
-在当前目录下生成名为sitename的目录做为博客主目录。在主目录下生成photos/thumb，videos，.pd 目录。其中photos目录用于存放照片生成照片墙页面，videos用于存放视频。.pd为配置目录。
+在当前目录下生成名为sitename的目录做为博客主目录。在主目录下生成photos/thumb，videos，.pd 目录和about.md文件。其中photos目录用于存放照片生成照片墙页面，videos用于存放视频。.pd为配置目录。about.md文件为生成关于页面的内容。
 
 ### pd post [name] [title] 创建新文章
 
@@ -41,6 +41,11 @@ pd - 静态博客生成工具
 ### pd http [port] 预览站点
 
 启动测试web服务器，默认port为:80。启动浏览器，输入http://127.0.0.1预览。
+
+### pd update 更新站点
+
+更新站点目录下.pd目录中的主题目录theme。以支持最新功能。
+
 
 配置
 ---

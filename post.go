@@ -56,7 +56,7 @@ func create_post(name, title string) {
 		fmt.Fprintf(os.Stderr, err.Error())
 		return
 	}
-	fmt.Printf("create post %s\n", filename)
+	fmt.Printf("create file %s.\n", filename)
 }
 
 func postApp(cmd *Command, args []string) {
