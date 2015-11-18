@@ -83,7 +83,8 @@ func zip_pd() {
 		if err != nil {
 			return filepath.SkipDir
 		}
-		header.Name, _ = filepath.Rel(filepath.Dir(".pd"), path)
+		p, _ := filepath.Rel(filepath.Dir(".pd"), path)
+		header.Name = strings.Replace(p, "\\", "/", -1)
 		if !info.IsDir() {
 			header.Method = 8
 			file, err = ioutil.ReadFile(path)
