@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sort"
@@ -87,6 +89,12 @@ func httpApp(cmd *Command, args []string) {
 		data.Content = MarkdownToHtml(data.Content)
 		comments[data.Id] = append(comments[data.Id], data)
 		w.Header().Add("Access-Control-Allow-Origin", "*")
+	})
+	http.HandleFunc("/__a.gif", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(r.URL.RawQuery)
+		w.Header().Set("Content-Type", "image/gif")
+		b, _ := base64.StdEncoding.DecodeString("R0lGODlhAQABAIAAAP///wAAACwAAAAAAQABAAACAkQBADs=")
+		w.Write(b)
 	})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.FileServer(http.Dir(".")).ServeHTTP(w, r)

@@ -101,12 +101,11 @@ func updateApp(cmd *Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	updatedir := filepath.Join(".pd", "theme")
 	for _, zf := range z.File {
 		if zf.FileInfo().IsDir() {
 			continue
 		}
-		if !strings.Contains(zf.Name, updatedir) {
+		if !strings.Contains(zf.Name, "/theme/") {
 			continue
 		}
 		os.MkdirAll(filepath.Dir(zf.Name), os.ModePerm)
