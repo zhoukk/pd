@@ -46,18 +46,7 @@ func newApp(cmd *Command, args []string) {
 		os.Exit(2)
 	}
 	sitedir := args[0]
-	photo_dir := filepath.Join(sitedir, "photos", "thumb")
-	err := os.MkdirAll(photo_dir, os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("create dir :%s.\n", photo_dir)
-	video_dir := filepath.Join(sitedir, "videos")
-	err = os.MkdirAll(video_dir, os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("create dir :%s.\n", video_dir)
+	os.Mkdir(sitedir, os.ModePerm)
 	aboutfile := filepath.Join(sitedir, "about.md")
 	ioutil.WriteFile(aboutfile, []byte("Hello, i am pd\n==="), os.ModePerm)
 	fmt.Printf("create file :%s.\n", aboutfile)

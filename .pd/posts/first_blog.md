@@ -23,7 +23,7 @@ pd - 静态博客生成工具
 
 ### pd new [sitename] 创建站点
 
-在当前目录下生成名为sitename的目录做为博客主目录。在主目录下生成photos/thumb，videos，.pd 目录和about.md文件。其中photos目录用于存放照片生成照片墙页面，videos用于存放视频。.pd为配置目录。about.md文件为生成关于页面的内容。
+在当前目录下生成名为sitename的目录做为博客主目录。在主目录下生成.pd目录和about.md文件。其中.pd为配置目录。about.md文件为生成关于页面的内容。
 
 ### pd post [name] [title] 创建新文章
 

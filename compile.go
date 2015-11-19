@@ -34,8 +34,6 @@ var (
 	Posts      AllPost
 	Categories map[string]AllPost
 	About      template.HTML
-	Videos     []string
-	Photos     []string
 	Htmls      []string
 )
 
@@ -85,10 +83,6 @@ func compileApp(cmd *Command, args []string) {
 		return
 	}
 	fmt.Printf("load theme :%s.\n", Theme)
-	LoadPhotos()
-	fmt.Printf("load photos.\n")
-	LoadVideos()
-	fmt.Printf("load videos.\n")
 	err = LoadPosts()
 	if err != nil {
 		log.Fatal(err)
@@ -181,36 +175,6 @@ func LoadTheme() error {
 		}
 		Htmls = append(Htmls, filename)
 	}
-	return err
-}
-
-func LoadPhotos() error {
-	err := filepath.Walk(filepath.Join("photos", "thumb"), func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		filename := filepath.Base(path)
-		if info.IsDir() || strings.HasPrefix(filename, ".") {
-			return nil
-		}
-		Photos = append(Photos, filename)
-		return nil
-	})
-	return err
-}
-
-func LoadVideos() error {
-	err := filepath.Walk("videos", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		filename := filepath.Base(path)
-		if info.IsDir() || strings.HasPrefix(filename, ".") {
-			return nil
-		}
-		Videos = append(Videos, filename)
-		return nil
-	})
 	return err
 }
 
@@ -356,8 +320,7 @@ func CreateHtml(html string) error {
 	} else {
 		t = template.Must(template.ParseFiles(filename))
 	}
-	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts,
-		"photos": Photos, "videos": Videos, "config": Config, "about": About})
+	err := t.Execute(&buf, Mapper{"categories": Categories, "posts": Posts, "config": Config, "about": About})
 	if err != nil {
 		return err
 	}
