@@ -1,6 +1,8 @@
 pd - 静态博客生成工具
 ===
 
+![preview](https://github.com/zhoukk/pd/blob/preview/preview.png)
+
 安装
 ---
 编译需要配置好golang开发环境
